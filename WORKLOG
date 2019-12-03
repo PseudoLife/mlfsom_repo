@@ -1,0 +1,34 @@
+1) in the mlfsom.params and mlfsom.com, change the "set outprefix" 
+
+2) in mlfsom.com, add "awk -f " to the beginning of the line "hkl2XYphi.awk ${tempfile}..." 
+
+3) in README file, "cp 1H87.pdb refine.pdb" should be >> "cp 1H87.pdb refined.pdb"
+
+4) fit2d in the folder was not executable and was replaced with "fit2d_17_006_MacOSX_7_5_intel64"
+from the website http://ftp.esrf.eu/pub/expg/FIT2D/
+
+5) in mlfsom.com file, if you turn on "set tempfile = mlfsom_tempfile" and turn off other options
+after running mlfsom.com it generates bunch of tempfiles. One of them is
+mlfsom_tempfilepristine_Fsqr.hkl. This file has hkl indices along with two columns one of which
+is F_squared. Relevant info for ${tempfile}pristine_Fsqr.hkl from mlfsom.com is below:
+# format "HKL"  H  K  L sin(theta)/lambda |F+|^2
+# format "HKL" -H -K -L sin(theta)/lambda |F-|^2
+
+6) in mlfsom.com, "set terminal table" lines (there are two of them) were changed to "set table" considering the info on 
+https://sourceforge.net/p/gnuplot/mailman/message/29227063/. If you do this it will not plot
+anything. If you do not change it two error messages appear in the temp file 
+mlfsom_tempfileincoherent_scatter. Alternatively, you can comment this line and then plot will be shown using our default
+terminal X11. However, one of the error still remains there. 
+
+7) Segmentation fault - raising lines in mlfsom.com:
+
+cat ${tempfile}.vignette |\
+fit2d -nographics >! ${tempfile}.vignette.log
+
+cat ${tempfile}.ripplemask |\
+fit2d -nographics >! ${tempfile}.ripplemask.log
+
+cat fit2d_${num}.in |\
+fit2d -nographics >! ${tempfile}.fit2d.log
+
+

@@ -1,0 +1,13 @@
+experiment - small-B
+N=1
+Start Mos=0.03
+k_mos=0.07
+k_cell=0.001
+k_bfactor=0.1
+beam_func=top-hat
+frames=10
+frame_rate=1
+angle_slices=1
+osc=0.01
+exp list weights:
+(frame,weight,experiment_ID)

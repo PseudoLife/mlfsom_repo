@@ -1,0 +1,13 @@
+experiment - better
+N=1
+Start Mos=0.05
+k_mos=0.2
+k_cell=0.002
+k_bfactor=3
+beam_func=top-hat
+frames=5
+frame_rate=1
+angle_slices=1
+osc=0.01
+exp list weights:
+(frame,weight,experiment_ID)
