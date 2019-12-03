@@ -9,16 +9,6 @@ from glob import glob
 mlfsom_path='/home/hakan/Desktop/MLFSOM/'
 tmp_path = '/tmp/hakan/'  # tmp path of the operating sys
 
-'''
-def Gaussian(peak=1,sigma=1):
-    """
-    Used by fn: SpacialDependentCrystal
-    Returns a 2D guassian function
-    peak: height of Gaussian
-    sigma: std of Gaussian
-    """
-    return lambda x,y: peak*e**(-(x**2+y**2)/(2*sigma**2))
-'''
 
 def GetExperimentList(N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, \
     osc=0.01, exposure=0.5, xtal_size=200, beam_fwhm_x=100, beam_fwhm_y=100):
@@ -70,7 +60,7 @@ def GetExperimentList(N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, \
 
     # calculate dose in each cell for each frame and params for each cell
     experiment_list = []
-    # tuple (ID,mos,bfactor_inc,cell_inc,frames,osc, exposure,sub_xtal_size,sub_beam_size,beam_flux)
+    # tuple (ID,mos,bfactor_inc,cell_inc,osc,exposure,sub_xtal_size,sub_beam_size,beam_flux)
     frame_weights = []
     # tuple (frame,weight,experiment_ID)
     for frame in range(0,frames):
@@ -132,23 +122,22 @@ def RunExperiments(experiment_list,resolution,solvent_B,prefix,threads):
     threads: number of images that are run at once
     """
     time_initial = time.time()
-    # copy pdb file to temp file
-    prev_cwd=os.getcwd()
+    prev_cwd = os.getcwd()
     os.chdir(mlfsom_path)
     os.system('cp 1H87.pdb temp.pdb')
     # clear previous temp files
     os.system('rm ' + join(tmp_path,'*'))
     
     # set up threading and run exps
-    p=mp.Pool(threads)
-    experiments_and_prefix=list(zip(experiment_list,[prefix]*len(experiment_list)))
+    p = mp.Pool(threads)
+    experiments_and_prefix = list(zip(experiment_list,[prefix]*len(experiment_list)))
     os.system('mkdir --parents ' + join(mlfsom_path,'data'))  # create sub-fol to save output files
     for i in range(0,len(experiments_and_prefix),threads):
         # generate input files
         for exp in experiments_and_prefix[i:i+threads]:
-            ID=exp[0][0]
-            bfactor_inc=exp[0][2]
-            cell_inc=exp[0][3]
+            ID = exp[0][0]
+            bfactor_inc = exp[0][2]
+            cell_inc = exp[0][3]
             print("generating inputs for id="+str(ID))
             subprocess.call(['./change_pdb_param.com', 'temp.pdb', 'input'+str(ID)+'.pdb', \
                 'add_cell='+str(cell_inc), 'add_bfactor='+str(bfactor_inc)])           
@@ -181,19 +170,19 @@ def RunExperiment(experiment_and_prefix):
     Images are saved as {prefix}###_001.img, where ### is the ID
     e.g. prefix = mseq and ID = 1, img => mseq1_001.img
     """
-    experiment=experiment_and_prefix[0]
-    prefix=experiment_and_prefix[1]
-    ID=experiment[0]
-    mos=experiment[1]
-    bfactor_inc=experiment[2]
-    cell_inc=experiment[3]
-    frames=experiment[4]
-    osc=experiment[5]
+
+    # (ID,mos,bfactor_inc,cell_inc,osc,exposure,sub_xtal_size,sub_beam_size,beam_flux)
+    experiment = experiment_and_prefix[0]
+    prefix = experiment_and_prefix[1]
+    ID,mos,bfactor_inc,cell_inc,osc,exposure,sub_xtal_size,sub_beam_size,beam_flux = experiment
+    # IS THE PRINT COMMAND BELOW REALLY NECESSARY???
     print ( ' '.join(['running id='+str(ID), 'mos='+str(mos), 'bfactor_inc='+str(bfactor_inc), \
-        'cell_inc='+str(cell_inc), 'osc='+str(osc)]) )
+        'cell_inc='+str(cell_inc), 'osc='+str(osc), 'exposure='+str(exposure),\
+        'sub_xtal_size='+str(sub_xtal_size), 'sub_beam_size='+str(sub_beam_size), 'beam_flux='+str(beam_flux)]) )
     subprocess.call([\
         './mlfsom.com', join(mlfsom_path,prefix), prefix+str(ID)+'_001.img', 'input'+str(ID)+'.mtz',\
-        'mosaic='+str(mos), 'frames='+str(frames), 'osc='+str(osc), 'id='+str(ID)])
+        'mosaic='+str(mos), 'frames=1', 'osc='+str(osc), 'id='+str(ID), 'exposure='+str(exposure), \
+        'xtal_size='+str(sub_xtal_size), 'beam_size='+str(sub_beam_size), 'flux='+str(beam_flux)])
     print('---- ID: '+str(ID)+' DONE ----')
 
 
