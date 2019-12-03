@@ -21,7 +21,7 @@ def gaussian(peak=1,sigma=1):
 
 
 def get_experiment_list(N, start_mos, k_mos, k_cell, k_bfactor, beam_func, frames, \
-    radial_symmetry=True, angle_slices=1, osc=0.01):
+    radial_symmetry=True, osc=0.01):
     """
     Used by the fn: spacial_dependent_crystal
     Returns a queue of params of exps, weights on the diffraction pattern,
@@ -36,12 +36,11 @@ def get_experiment_list(N, start_mos, k_mos, k_cell, k_bfactor, beam_func, frame
     beam_func: defines spacial distribution of power of beam
     radial_symmetry: if True, assumes beam_func is radially symmetric, if False, does not
     frames: number of frames
-    angle_slices: number of angles slices xtl is rotated in each frames (1 for stills)
     osc: angle in degrees xtl rotates for each angle slice (0.01 is good for stills)
     
     Note: dose = frame*beam_func(x,y)
     Returns tuple of list of params for exps to be calc by mlfsom:
-    (ID,mos,bfactor_inc,cell_inc,frames,angle_slices,osc)
+    (ID,mos,bfactor_inc,cell_inc,frames,osc)
     and list of weights to each set of exp on each frame, frame_weights:
     (frame,weight,exp_ID)
     """
@@ -73,13 +72,12 @@ def get_experiment_list(N, start_mos, k_mos, k_cell, k_bfactor, beam_func, frame
             dose=beam_func(cell[0],cell[1])*exposure
             experiment_list.append(\
                 (ID, round(start_mos+k_mos*dose,3), round(k_bfactor*dose,2),\
-                 round(k_cell*dose,4), angle_slices, osc))
+                 round(k_cell*dose,4), osc))
     
     return (frame_weights,experiment_list)
 
 
-def get_homogenous_experiment_list(start_mos,k_mos,k_cell,k_bfactor,frames,\
-    angle_slices=1,osc=0.01):
+def get_homogenous_experiment_list(start_mos,k_mos,k_cell,k_bfactor,frames,osc=0.01):
     """
     Used by fn: homogenous_crystal
     Returns a queue of params of exps for mlfsom to calc dose dependent diff.
@@ -90,12 +88,11 @@ def get_homogenous_experiment_list(start_mos,k_mos,k_cell,k_bfactor,frames,\
     k_cell: fractional increase in unit cell dim. given by cell_dimenion_0*(1+k_cell*dose)
     k_bfactor: increase in b-factors given by B_0 + k_bfactor*dose
     frames: number of frames
-    angle_slices: number of angles slices xtl is rotated through in each frames (1 for stills)
     osc: angle in degrees xtl rotates for each angle slice (0.01 is good for stills)
     
     Note: the dose in each frame is given by frame*1
     Returns list of params for exps to be calc by mlfsom:
-    (ID,mos,bfactor_inc,cell_inc,angle_slices,osc)
+    (ID,mos,bfactor_inc,cell_inc,osc)
     """
     experiment_list=[]  # tuple(ID,mos,bfactor_inc,cell_inc,frames,osc)
     for frame in range(0,frames):
@@ -104,7 +101,7 @@ def get_homogenous_experiment_list(start_mos,k_mos,k_cell,k_bfactor,frames,\
         ID = len(experiment_list)
         experiment_list.append(\
             (ID, round(start_mos+k_mos*dose,3), round(k_bfactor*dose,2), \
-                round(k_cell*dose,4), angle_slices, osc))
+                round(k_cell*dose,4), osc))
     return experiment_list
 
 
@@ -113,7 +110,7 @@ def run_experiments(experiment_list,prefix,threads):
     Used by fn: spacial_dependent_crystal, homogenous_crystal, run_from_exp_queue
     Runs each exp. and generates the diff pattern defined in experiment_list
     Saves imgs to mlfsom_path and necessary temp files to mlfsom_path/data
-    experiment_list: tuple (ID,mos,bfactor_inc,cell_inc,angle_slices,osc)
+    experiment_list: tuple (ID,mos,bfactor_inc,cell_inc,osc)
     Images are saved as {prefix}###_001.img, where ### is the ID
     e.g. prefix = mseq and ID = 1, img => mseq1_001.img
     threads: number of images that are run at once
@@ -163,7 +160,7 @@ def run_experiment(experiment_and_prefix):
     Used by fn: run_experiments
     Runs mlfsom with params defined by exp and outprefix
     experiment_and_prefix: two tuple
-    first is exp params => (ID,mos,bfactor_inc,cell_inc,angle_slices,osc)
+    first is exp params => (ID,mos,bfactor_inc,cell_inc,osc)
     second is prefix
     Images are saved as {prefix}###_001.img, where ### is the ID
     e.g. prefix = mseq and ID = 1, img => mseq1_001.img
@@ -185,7 +182,7 @@ def run_experiment(experiment_and_prefix):
 
 
 def spacial_dependent_crystal(N,start_mos,k_mos,k_cell,k_bfactor,beam_func,frames,\
-    prefix,angle_slices=1,osc=.01,radial_symmetry=True):
+    prefix,osc=.01,radial_symmetry=True):
     """
     Generates files defining the params of exps, weights on the diff. pattern, and frame number
     for mlfsom to calc spacial and dose dep. diff. patterns for a non-homogenous xtl
@@ -199,7 +196,6 @@ def spacial_dependent_crystal(N,start_mos,k_mos,k_cell,k_bfactor,beam_func,frame
     beam_func: defines spacial dist. of power of beam, e.g. gaussian(peak=1,simga=1)
     radial_symmetry: if True, assumes beam_func is radially symmetric
     frames: number of frames
-    angle_slices: number of angles slices xtl is rotated in each frames (1 for stills)
     osc: angle in deg. xtl rotates for each angle slice (0.01 is good for stills)
     
     Files generated:
@@ -207,20 +203,19 @@ def spacial_dependent_crystal(N,start_mos,k_mos,k_cell,k_bfactor,beam_func,frame
     exp-{prefix}-queue.txt - list of exps to be run, intended to be used in run_from_exp_queue
     exp-{prefix}-list.txt - back up list of exps
     Returns tuple of list of params for exps to be calc. by mlfsom given:
-    (ID,mos,bfactor_inc,cell_inc,frames,angle_slices,osc)
+    (ID,mos,bfactor_inc,cell_inc,frames,osc)
     """
     frame_weights,experiment_list=get_experiment_list(\
         N, start_mos, k_mos, k_cell, k_bfactor, beam_func, frames,\
-        radial_symmetry=radial_symmetry, angle_slices=angle_slices, osc=osc)
+        radial_symmetry=radial_symmetry, osc=osc)
     write_description(N, start_mos, k_mos,k_cell, k_bfactor, beam_func, frames,\
-        prefix, angle_slices, osc, frame_weights)
+        prefix, osc, frame_weights)
     write_exp_queue_and_list(experiment_list,prefix)
     #run_experiments(experiment_list,prefix,threads=4)
     return experiment_list
 
 
-def homogenous_crystal(start_mos,k_mos,k_cell,k_bfactor,frames,\
-    prefix,angle_slices=1,osc=.01):
+def homogenous_crystal(start_mos,k_mos,k_cell,k_bfactor,frames,prefix,osc=.01):
     """
     Generates files defining the params of exps for mlfsom to calc
     dose dep. diff. patterns for a homogenous xtl given by:
@@ -230,23 +225,22 @@ def homogenous_crystal(start_mos,k_mos,k_cell,k_bfactor,frames,\
     k_cells: fractional increase in unit cell dim. given by cell_dimenion_0*(1+k_cell*dose)
     k_bfactor: increase in b-factors given by B_0 + k_bfactor*dose
     frames: number of frames
-    angle_slices: number of angles slices xtl is rotated in each frames (1 for stills)
     osc: angle in deg. xtl rotates for each angle slice (0.01 is good for stills)
     
     Returns list of params for exps to be calculated by mlffsom:
-    (ID,mos,bfactor_inc,cell_inc,angle_slices,osc)
+    (ID,mos,bfactor_inc,cell_inc,osc)
     Files generated:
     exp-{prefix}-desc.txt - lists the params of the exp
     exp-{prefix}-queue.txt - list of exps to be run, intended to be used in run_from_exp_queue
     exp-{prefix}-list.txt - back up list of exps
     Returns tuple of list of params for exps to be calc by mlfsom:
-    (ID,mos,bfactor_inc,cell_inc,frames,angle_slices,osc)
+    (ID,mos,bfactor_inc,cell_inc,frames,osc)
     """
     experiment_list=get_homogenous_experiment_list(\
-        start_mos,k_mos,k_cell,k_bfactor,frames,angle_slices=angle_slices,osc=osc)
+        start_mos,k_mos,k_cell,k_bfactor,frames,osc=osc)
     write_description(\
         1, start_mos, k_mos, k_cell, k_bfactor, "top-hat", frames, \
-        prefix, angle_slices, osc, frame_weights=[])
+        prefix, osc, frame_weights=[])
     write_exp_queue_and_list(experiment_list,prefix)
     run_experiments(experiment_list,prefix,threads=4)
     return experiment_list
@@ -257,7 +251,7 @@ def write_exp_queue_and_list(experiment_list,prefix):
     Used by fn: homogenous_crystal, spacial_dependent_crystal
     Writes list of exps to exp-{prefix}-queue.txt and exp-{prefix}-list.txt
     experiment_list: list of tuples defing exp params:
-    (ID,mos,bfactor_inc,cell_inc,angle_slices,osc)
+    (ID,mos,bfactor_inc,cell_inc,osc)
     prefix: name of exp
     """
     f=open("exp-"+prefix+"-queue.txt","w")
@@ -274,7 +268,7 @@ def read_exp_list(file):
     Standalone fn
     Reads in exp list in file
     returns list of tuples defing exp params:
-    (ID,mos,bfactor_inc,cell_inc,angle_slices,osc)
+    (ID,mos,bfactor_inc,cell_inc,osc)
     """
     exp_list=[]
     with open(file,"r") as f:
@@ -288,7 +282,7 @@ def run_from_exp_queue(queue_file,N,threads,prefix):
     Standalone fn
     Runs and clears top N frames defined in queue_file
     queue_file: file listing frames to be generated by mlfsom
-    each frame should be defined by (ID,mos,bfactor_inc,cell_inc,angle_slices,osc)
+    each frame should be defined by (ID,mos,bfactor_inc,cell_inc,osc)
     Should be the file exp-{prefix}-queue.img
     N: number of frames to be run
     threads: number of frames run at once
@@ -310,7 +304,7 @@ def run_from_exp_queue(queue_file,N,threads,prefix):
 
 def write_description(\
     N, start_mos, k_mos, k_cell, k_bfactor, beam_func, frames,\
-    prefix, angle_slices, osc, frame_weights):
+    prefix, osc, frame_weights):
     """
     Used by fn: homogenous_crystal, spacial_dependent_crystal
     Writes exp. params to a file e.g. exp-prefix-desc.txt
@@ -324,7 +318,6 @@ def write_description(\
     f.write("k_bfactor="+str(k_bfactor)+"\n")
     f.write("beam_func="+str(beam_func)+"\n")
     f.write("frames="+str(frames)+"\n")
-    f.write("angle_slices="+str(angle_slices)+"\n")
     f.write("osc="+str(osc)+"\n")
     f.write("exp list weights:"+"\n")
     f.write("(frame,weight,experiment_ID)"+"\n")
