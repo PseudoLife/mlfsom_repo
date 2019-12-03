@@ -21,7 +21,7 @@ def gaussian(peak=1,sigma=1):
 
 
 def get_experiment_list(N, start_mos, k_mos, k_cell, k_bfactor, beam_func, frames, \
-    frame_rate, radial_symmetry=True, angle_slices=1, osc=0.01):
+    radial_symmetry=True, angle_slices=1, osc=0.01):
     """
     Used by the fn: spacial_dependent_crystal
     Returns a queue of params of exps, weights on the diffraction pattern,
@@ -36,11 +36,10 @@ def get_experiment_list(N, start_mos, k_mos, k_cell, k_bfactor, beam_func, frame
     beam_func: defines spacial distribution of power of beam
     radial_symmetry: if True, assumes beam_func is radially symmetric, if False, does not
     frames: number of frames
-    frame_rate: frame rate of exp
     angle_slices: number of angles slices xtl is rotated in each frames (1 for stills)
     osc: angle in degrees xtl rotates for each angle slice (0.01 is good for stills)
     
-    Note: dose = frame/frame_rate*beam_func(x,y)
+    Note: dose = frame*beam_func(x,y)
     Returns tuple of list of params for exps to be calc by mlfsom:
     (ID,mos,bfactor_inc,cell_inc,frames,angle_slices,osc)
     and list of weights to each set of exp on each frame, frame_weights:
@@ -67,7 +66,7 @@ def get_experiment_list(N, start_mos, k_mos, k_cell, k_bfactor, beam_func, frame
     experiment_list=[] # tuple (ID,mos,bfactor_inc,cell_inc,frames,osc)
     frame_weights=[]   # tuple (frame,weight,experiment_ID)
     for frame in range(0,frames):
-        exposure=frame/frame_rate
+        exposure=frame
         for cell in cell_list:
             ID=len(experiment_list)
             frame_weights.append((frame+1,cell[2],ID))
@@ -80,7 +79,7 @@ def get_experiment_list(N, start_mos, k_mos, k_cell, k_bfactor, beam_func, frame
 
 
 def get_homogenous_experiment_list(start_mos,k_mos,k_cell,k_bfactor,frames,\
-    frame_rate,angle_slices=1,osc=0.01):
+    angle_slices=1,osc=0.01):
     """
     Used by fn: homogenous_crystal
     Returns a queue of params of exps for mlfsom to calc dose dependent diff.
@@ -91,17 +90,16 @@ def get_homogenous_experiment_list(start_mos,k_mos,k_cell,k_bfactor,frames,\
     k_cell: fractional increase in unit cell dim. given by cell_dimenion_0*(1+k_cell*dose)
     k_bfactor: increase in b-factors given by B_0 + k_bfactor*dose
     frames: number of frames
-    frame_rate: frame rate of exp. (units of 1/time)
     angle_slices: number of angles slices xtl is rotated through in each frames (1 for stills)
     osc: angle in degrees xtl rotates for each angle slice (0.01 is good for stills)
     
-    Note: the dose in each frame is given by frame/frame_rate*1
+    Note: the dose in each frame is given by frame*1
     Returns list of params for exps to be calc by mlfsom:
     (ID,mos,bfactor_inc,cell_inc,angle_slices,osc)
     """
     experiment_list=[]  # tuple(ID,mos,bfactor_inc,cell_inc,frames,osc)
     for frame in range(0,frames):
-        exposure = frame/frame_rate
+        exposure = frame
         dose = 1*exposure
         ID = len(experiment_list)
         experiment_list.append(\
@@ -187,7 +185,7 @@ def run_experiment(experiment_and_prefix):
 
 
 def spacial_dependent_crystal(N,start_mos,k_mos,k_cell,k_bfactor,beam_func,frames,\
-    frame_rate,prefix,angle_slices=1,osc=.01,radial_symmetry=True):
+    prefix,angle_slices=1,osc=.01,radial_symmetry=True):
     """
     Generates files defining the params of exps, weights on the diff. pattern, and frame number
     for mlfsom to calc spacial and dose dep. diff. patterns for a non-homogenous xtl
@@ -201,7 +199,6 @@ def spacial_dependent_crystal(N,start_mos,k_mos,k_cell,k_bfactor,beam_func,frame
     beam_func: defines spacial dist. of power of beam, e.g. gaussian(peak=1,simga=1)
     radial_symmetry: if True, assumes beam_func is radially symmetric
     frames: number of frames
-    frame_rate: frame rate of exp
     angle_slices: number of angles slices xtl is rotated in each frames (1 for stills)
     osc: angle in deg. xtl rotates for each angle slice (0.01 is good for stills)
     
@@ -213,16 +210,16 @@ def spacial_dependent_crystal(N,start_mos,k_mos,k_cell,k_bfactor,beam_func,frame
     (ID,mos,bfactor_inc,cell_inc,frames,angle_slices,osc)
     """
     frame_weights,experiment_list=get_experiment_list(\
-        N, start_mos, k_mos, k_cell, k_bfactor, beam_func, frames, frame_rate,\
+        N, start_mos, k_mos, k_cell, k_bfactor, beam_func, frames,\
         radial_symmetry=radial_symmetry, angle_slices=angle_slices, osc=osc)
     write_description(N, start_mos, k_mos,k_cell, k_bfactor, beam_func, frames,\
-        frame_rate, prefix, angle_slices, osc, frame_weights)
+        prefix, angle_slices, osc, frame_weights)
     write_exp_queue_and_list(experiment_list,prefix)
-    run_experiments(experiment_list,prefix,threads=4)
+    #run_experiments(experiment_list,prefix,threads=4)
     return experiment_list
 
 
-def homogenous_crystal(start_mos,k_mos,k_cell,k_bfactor,frames,frame_rate,\
+def homogenous_crystal(start_mos,k_mos,k_cell,k_bfactor,frames,\
     prefix,angle_slices=1,osc=.01):
     """
     Generates files defining the params of exps for mlfsom to calc
@@ -233,7 +230,6 @@ def homogenous_crystal(start_mos,k_mos,k_cell,k_bfactor,frames,frame_rate,\
     k_cells: fractional increase in unit cell dim. given by cell_dimenion_0*(1+k_cell*dose)
     k_bfactor: increase in b-factors given by B_0 + k_bfactor*dose
     frames: number of frames
-    frame_rate: frame rate of experiment
     angle_slices: number of angles slices xtl is rotated in each frames (1 for stills)
     osc: angle in deg. xtl rotates for each angle slice (0.01 is good for stills)
     
@@ -247,10 +243,10 @@ def homogenous_crystal(start_mos,k_mos,k_cell,k_bfactor,frames,frame_rate,\
     (ID,mos,bfactor_inc,cell_inc,frames,angle_slices,osc)
     """
     experiment_list=get_homogenous_experiment_list(\
-        start_mos,k_mos,k_cell,k_bfactor,frames,frame_rate,angle_slices=angle_slices,osc=osc)
+        start_mos,k_mos,k_cell,k_bfactor,frames,angle_slices=angle_slices,osc=osc)
     write_description(\
         1, start_mos, k_mos, k_cell, k_bfactor, "top-hat", frames, \
-        frame_rate, prefix, angle_slices, osc, frame_weights=[])
+        prefix, angle_slices, osc, frame_weights=[])
     write_exp_queue_and_list(experiment_list,prefix)
     run_experiments(experiment_list,prefix,threads=4)
     return experiment_list
@@ -314,7 +310,7 @@ def run_from_exp_queue(queue_file,N,threads,prefix):
 
 def write_description(\
     N, start_mos, k_mos, k_cell, k_bfactor, beam_func, frames,\
-    frame_rate, prefix, angle_slices, osc, frame_weights):
+    prefix, angle_slices, osc, frame_weights):
     """
     Used by fn: homogenous_crystal, spacial_dependent_crystal
     Writes exp. params to a file e.g. exp-prefix-desc.txt
@@ -328,7 +324,6 @@ def write_description(\
     f.write("k_bfactor="+str(k_bfactor)+"\n")
     f.write("beam_func="+str(beam_func)+"\n")
     f.write("frames="+str(frames)+"\n")
-    f.write("frame_rate="+str(frame_rate)+"\n")
     f.write("angle_slices="+str(angle_slices)+"\n")
     f.write("osc="+str(osc)+"\n")
     f.write("exp list weights:"+"\n")
