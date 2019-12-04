@@ -227,7 +227,7 @@ def SpacialDependentCrystal(prefix,N_grid,start_mos,k_mos,k_cell,k_bfactor,\
     # Move files
     os.system('mv ' + join(mlfsom_path,'input*.pdb ') + output_folder)
     os.system('mv ' + join(mlfsom_path,'input*.mtz ') + output_folder)
-    os.system('mv ' + join(mlfsom_path,'exp-*.txt ') + output_folder)
+    os.system('mv ' + join(mlfsom_path,'exp-'+prefix+'*.txt ') + output_folder)
     print 'Format: ID, mos, bfactor_inc, cell_inc, osc, exposure, sub_xtal_size, sub_beam_size, sub_beam_flux'
     return experiment_list
 
