@@ -100,7 +100,7 @@ def PlotMLFSOMPeakIntensities(df_mlfsomPeaks,first_N_peaks=None):
 		first_N_peaks = df_peaks.shape[0]  # plot all peaks if not provided
 
 	frame_numbers = np.sort([col for col in df_peaks.columns if type(col)==int]).tolist()
-	# IMPORTANT: Fill NaN intensity values with 0.1
+	# IMPORTANT: Fill NaN intensity values with 0.1 to avoid numerical problems
 	df_peaks[frame_numbers] = df_peaks[frame_numbers].fillna(0.1)
 	
 	zeros = int(np.log10(df_peaks[frame_numbers].max().max())) # Number of excessive zeros to rescale y axis
