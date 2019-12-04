@@ -66,7 +66,7 @@ def GetExperimentList(N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, \
     for frame in range(0,frames):
         for cell in cell_list:
             ID = len(experiment_list)
-            frame_weights.append((frame+1,cell[2],ID))  # why does frame of frame_weights start from 1 instead of 0??????? 
+            frame_weights.append((frame+1,cell[2],ID)) # WHY does frame of frame_weights start from 1 instead of 0??? 
             x_coord = cell[0]*sub_xtal_size
             y_coord = cell[1]*sub_xtal_size
             # decay factor is fractional decay in the int. of the incident beam relative to the max. int
@@ -113,7 +113,7 @@ def RunExperiments(experiment_list,resolution,solvent_B,prefix,threads):
     """
     Used by fn: SpacialDependentCrystal, HomogenousCrystal, RunFromExpQueue
     Runs each exp. and generates the diff pattern defined in experiment_list
-    Saves imgs to mlfsom_path and necessary temp files to mlfsom_path/data
+    Saves imgs to mlfsom_path and necessary temp files to mlfsom_path/[prefix]
     experiment_list: tuple (ID,mos,bfactor_inc,cell_inc,osc)
     resolution: initial resolution of the diffraction
     solvent_B: does this change during the run at all??? needs more inspection
@@ -131,7 +131,7 @@ def RunExperiments(experiment_list,resolution,solvent_B,prefix,threads):
     # set up threading and run exps
     p = mp.Pool(threads)
     experiments_and_prefix = list(zip(experiment_list,[prefix]*len(experiment_list)))
-    os.system('mkdir --parents ' + join(mlfsom_path,'data'))  # create sub-fol to save output files
+    os.system('mkdir --parents ' + join(mlfsom_path,prefix))  # create sub-fol to save output files
     for i in range(0,len(experiments_and_prefix),threads):
         # generate input files
         for exp in experiments_and_prefix[i:i+threads]:
@@ -148,13 +148,13 @@ def RunExperiments(experiment_list,resolution,solvent_B,prefix,threads):
         
         # clear temp files and move results
         print("clearing temp files and moving results")
-        os.system('mv ' + join(tmp_path,'mlfsom*.XYI ') + join(mlfsom_path,'data/'))    
-        os.system('mv '+ join(tmp_path,'mlfsom*predin.txt ') + join(mlfsom_path,'data/'))        
+        os.system('mv ' + join(tmp_path,'mlfsom*.XYI ') + join(mlfsom_path,prefix))    
+        os.system('mv '+ join(tmp_path,'mlfsom*predin.txt ') + join(mlfsom_path,prefix))        
         os.system('rm '+ join(mlfsom_path,'fit2d_*'))
         os.system('rm ' + join(tmp_path,'*'))
 
         # Function below might not be doing its job!!!
-        RenameTempFiles(experiments_and_prefix[i:i+threads], join(mlfsom_path,'data'))
+        RenameTempFiles(experiments_and_prefix[i:i+threads], join(mlfsom_path,prefix))
     time_final = time.time()
     print 'TOTAL TIME ELAPSED: %i min' %int((time_final-time_initial)/60)
     os.chdir(prev_cwd)
