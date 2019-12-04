@@ -181,7 +181,7 @@ def RunExperiment(experiment_and_prefix):
         'sub_xtal_size='+str(sub_xtal_size), 'sub_beam_size='+str(sub_beam_size), 'beam_flux='+str(beam_flux)]) )
     subprocess.call([\
         './mlfsom.com', join(mlfsom_path,prefix), prefix+str(ID)+'_001.img', 'input'+str(ID)+'.mtz',\
-        'mosaic='+str(mos), 'frames=1', 'osc='+str(osc), 'id='+str(ID), 'exposure='+str(exposure), \
+        'frames=1', 'id='+str(ID), 'mosaic='+str(mos), 'osc='+str(osc), 'exposure='+str(exposure), \
         'xtal_size='+str(sub_xtal_size), 'beam_size='+str(sub_beam_size), 'flux='+str(beam_flux)])
     print('---- ID: '+str(ID)+' DONE ----')
 
