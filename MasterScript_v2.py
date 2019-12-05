@@ -66,7 +66,7 @@ def GetExperimentList(N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, \
     for frame in range(0,frames):
         for cell in cell_list:
             ID = len(experiment_list)
-            frame_weights.append((frame+1,cell[2],ID)) # WHY does frame of frame_weights start from 1 instead of 0??? 
+            frame_weights.append((frame,cell[2],ID))  
             x_coord = cell[0]*sub_xtal_size
             y_coord = cell[1]*sub_xtal_size
             # decay factor is fractional decay in the int. of the incident beam relative to the max. int
@@ -175,7 +175,6 @@ def RunExperiment(experiment_and_prefix):
     Images are saved as {prefix}###_001.img, where ### is the ID
     e.g. prefix = mseq and ID = 1, img => mseq1_001.img
     """
-
     # (ID,mos,bfactor_inc,cell_inc,osc,exposure,sub_xtal_size,sub_beam_size,sub_beam_flux)
     experiment = experiment_and_prefix[0]
     prefix = experiment_and_prefix[1]
@@ -270,6 +269,7 @@ def HomogenousCrystal(prefix,start_mos,k_mos,k_cell,k_bfactor,frames,\
     output_folder = join(mlfsom_path,'data_'+prefix)
     os.system('mkdir --parents ' + output_folder)  # create sub-fol to save output files
 
+    # some exp. constants for homogenous beam case
     N_grid = None
     xtal_size = 77.8
     beam_fwhm_x = 100
