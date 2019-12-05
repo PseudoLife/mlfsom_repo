@@ -6,7 +6,7 @@ import multiprocessing as mp
 from glob import glob
 
 
-mlfsom_path='~/Desktop/MLFSOM'
+mlfsom_path='/home/hakan/Desktop/MLFSOM'
 tmp_path = '/tmp/hakan/'  # tmp path of the operating sys
 
 
@@ -223,7 +223,7 @@ def SpacialDependentCrystal(prefix,N_grid,start_mos,k_mos,k_cell,k_bfactor,\
     WriteDescription(prefix, N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, resolution, \
     solvent_B, osc, exposure, xtal_size, beam_fwhm_x, beam_fwhm_y, threads, frame_weights)
     WriteExpQueueAndList(experiment_list,prefix)
-    #RunExperiments(prefix,experiment_list,resolution,solvent_B,threads)
+    RunExperiments(prefix,experiment_list,resolution,solvent_B,threads)
     # Move files
     os.system('mv ' + join(mlfsom_path,'input*.pdb ') + output_folder)
     os.system('mv ' + join(mlfsom_path,'input*.mtz ') + output_folder)
