@@ -26,7 +26,7 @@ def GetExperimentList(N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, \
     frames: number of frames
     osc: angle in degrees xtl rotates for each angle slice (0.01 is good for stills)
     exposure: exposure time per frame in sec (0.5 sec is mlfsom default)
-    xtal_size: crystal size in um
+    xtal_size: full crystal size in um
     beam_fwhm_x, beam_fwhm_y: in um  
 
     Note: dose = frame-no*decay-factor where decay-factor is exp(-(x**2+y**2)/(2*sigma**2))
@@ -77,16 +77,16 @@ def GetExperimentList(N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, \
                 (ID, round(start_mos+k_mos*dose,3), round(k_bfactor*dose,2),\
                  round(k_cell*dose,4), osc, exposure, sub_xtal_size, sub_beam_size, sub_beam_flux))
     
+    # experiment_list: (ID,mos,bfactor_inc,cell_inc,osc,exposure,sub_xtal_size,sub_beam_size,sub_beam_flux)
+    # frame_wights: (frame,weight,experiment_ID)
     return (frame_weights,experiment_list)
 
 
-def GetHomogenousExperimentList(start_mos,k_mos,k_cell,k_bfactor,frames,\
-    osc=0.01, exposure=0.5):
+def GetHomogenousExperimentList(start_mos, k_mos, k_cell, k_bfactor, frames, osc=0.01, exposure=0.5):
     """
-    NEEDS TO BE MODIFIED SIGNIFICANTLY TO ADJUST THE CHANGES IN OTHER FUNCTIONS!!!
     Used by fn: HomogenousCrystal
     Returns a queue of params of exps for mlfsom to calc dose dependent diff.
-    for a homogenous crystal model given by:
+    for a homogenously illuminated crystal model given by:
     
     start_mos: starting value of mos
     k_mos: increase in mosaicity given by mos_0 + k_mos*dose
@@ -101,12 +101,16 @@ def GetHomogenousExperimentList(start_mos,k_mos,k_cell,k_bfactor,frames,\
     (ID,mos,bfactor_inc,cell_inc,osc,exposure)
     """
     experiment_list=[]  # tuple(ID,mos,bfactor_inc,cell_inc,frames,osc)
+    xtal_size = 77.8  # some exp. constants for homogenous beam case
+    beam_size = 100
+    beam_flux = 8.4e10
     for frame in range(0,frames):
         dose = frame
         ID = len(experiment_list)
         experiment_list.append(\
-            (ID, round(start_mos+k_mos*dose,3), round(k_bfactor*dose,2), \
-                round(k_cell*dose,4), osc, exposure))
+            (ID, round(start_mos+k_mos*dose,3), round(k_bfactor*dose,2),\
+             round(k_cell*dose,4), osc, exposure, xtal_size, beam_size,beam_flux))
+    # experiment_list: (ID,mos,bfactor_inc,cell_inc,osc,exposure,sub_xtal_size,sub_beam_size,sub_beam_flux)
     return experiment_list
 
 
@@ -118,13 +122,13 @@ def RunExperiments(prefix,experiment_list,resolution=2.5,solvent_B=35,threads=4)
     experiment_list: tuple (ID,mos,bfactor_inc,cell_inc,osc)
     resolution: mlfsom default 2.5 A. initial resolution of the diffraction
     solvent_B: mlfsom default 35. does this change during the run at all??? needs more inspection
+    threads: number of images that are run at once
     Images are saved as {prefix}###_001.img, where ### is the ID
     e.g. prefix = mseq and ID = 1, img => mseq1_001.img
-    threads: number of images that are run at once
     """
     time_initial = time.time()
     prev_cwd = os.getcwd()
-    os.chdir(mlfsom_path)
+    os.chdir(os.path.expanduser(mlfsom_path))
     os.system('cp 1H87.pdb temp.pdb')
     os.system('rm ' + join(tmp_path,'*')) # clear previous temp files
     
@@ -148,7 +152,7 @@ def RunExperiments(prefix,experiment_list,resolution=2.5,solvent_B=35,threads=4)
         p.map(RunExperiment,experiments_and_prefix[i:i+threads])
         
         # clear temp files and move results
-        print("clearing temp files and moving results")
+        print('clearing temp files and moving results')
         os.system('mv ' + join(tmp_path,'mlfsom*.XYI ') + output_folder)    
         os.system('mv '+ join(tmp_path,'mlfsom*predin.txt ') + output_folder)        
         os.system('rm '+ join(mlfsom_path,'fit2d_*'))
@@ -198,15 +202,20 @@ def SpacialDependentCrystal(prefix,N_grid,start_mos,k_mos,k_cell,k_bfactor,\
     for mlfsom to calc spacial and dose dep. diff. patterns for a non-homogenous xtl
     e.g. SpacialDependentCrystal(5,0.05,0.07,0.0153,2.228,Gaussian(10/14),14,1,"sp_seq1_")
     
+    prefix: name of the exp
     N_grid by N_grid (even number) grid of cells that are centered on the beam
     start_mos: starting value of mos
     k_mos: increase in mos given by mos_0 + k_mos*dose
     k_cell: fractional increase in unit cell dim. given by cell_dimenion_0*(1+k_cell*dose)
     k_bfactor: increase in b-factors given by B_0 + k_bfactor*dose
-    beam_func: defines spacial dist. of power of beam, e.g. Gaussian(peak=1,simga=1)
-    radial_symmetry: if True, assumes beam_func is radially symmetric
-    frames: number of frames
+    frames: number of frames    
+    resolution: res in A
+    solvent_B: solvent B factor - how does this affect the results - needs more inspection 
     osc: angle in deg. xtl rotates for each angle slice (0.01 is good for stills)
+    exposure: exposure time per frame in sec 
+    xtal_size: total size of the crystal in um
+    beam_fwhm_x, beam_fwhm_y: in um
+    threads: number of images that are run at once
     
     Files generated:
     exp-{prefix}-desc.txt - lists the params of the exp
@@ -222,28 +231,32 @@ def SpacialDependentCrystal(prefix,N_grid,start_mos,k_mos,k_cell,k_bfactor,\
         k_bfactor, frames, osc, exposure, xtal_size, beam_fwhm_x, beam_fwhm_y)
     WriteDescription(prefix, N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, resolution, \
     solvent_B, osc, exposure, xtal_size, beam_fwhm_x, beam_fwhm_y, threads, frame_weights)
-    WriteExpQueueAndList(experiment_list,prefix)
+    WriteExpQueueAndList(prefix,experiment_list)
     RunExperiments(prefix,experiment_list,resolution,solvent_B,threads)
     # Move files
     os.system('mv ' + join(mlfsom_path,'input*.pdb ') + output_folder)
     os.system('mv ' + join(mlfsom_path,'input*.mtz ') + output_folder)
     os.system('mv ' + join(mlfsom_path,'exp-'+prefix+'*.txt ') + output_folder)
-    print 'Format: ID, mos, bfactor_inc, cell_inc, osc, exposure, sub_xtal_size, sub_beam_size, sub_beam_flux'
+    print 'ID, mos, bfactor_inc, cell_inc, osc, exposure, sub_xtal_size, sub_beam_size, sub_beam_flux:'
     return experiment_list
 
 
-def HomogenousCrystal(start_mos,k_mos,k_cell,k_bfactor,frames,prefix,osc=.01):
+def HomogenousCrystal(prefix,start_mos,k_mos,k_cell,k_bfactor,frames,\
+    resolution=2.5,solvent_B=35,osc=.01,exposure=0.5,threads=4):
     """
-    NEEDS TO BE MODIFIED SIGNIFICANTLY
     Generates files defining the params of exps for mlfsom to calc
     dose dep. diff. patterns for a homogenous xtl given by:
-    
+    prefix: name of the experiment
     start_mos: starting value of moasicty
     k_mos: increase in mosaicity given by mos_0 + k_mos*dosef
     k_cells: fractional increase in unit cell dim. given by cell_dimenion_0*(1+k_cell*dose)
     k_bfactor: increase in b-factors given by B_0 + k_bfactor*dose
     frames: number of frames
+    resolution: res in A
+    solvent_B: solvent B factor - how does this affect the results - needs more inspection 
     osc: angle in deg. xtl rotates for each angle slice (0.01 is good for stills)
+    exposure: exposure time per frame in sec
+    threads: number of images that are run at once
     
     Returns list of params for exps to be calculated by mlffsom:
     (ID,mos,bfactor_inc,cell_inc,osc)
@@ -254,22 +267,34 @@ def HomogenousCrystal(start_mos,k_mos,k_cell,k_bfactor,frames,prefix,osc=.01):
     Returns tuple of list of params for exps to be calc by mlfsom:
     (ID,mos,bfactor_inc,cell_inc,frames,osc)
     """
-    experiment_list=GetHomogenousExperimentList(\
-        start_mos,k_mos,k_cell,k_bfactor,frames,osc=osc)
-    WriteDescription(\
-        1, start_mos, k_mos, k_cell, k_bfactor, "top-hat", frames, \
-        prefix, osc, frame_weights=[])
-    WriteExpQueueAndList(experiment_list,prefix)
-    RunExperiments(prefix,experiment_list,resolution,solvent_B,threads)
+    output_folder = join(mlfsom_path,'data_'+prefix)
+    os.system('mkdir --parents ' + output_folder)  # create sub-fol to save output files
+
+    N_grid = None
+    xtal_size = 77.8
+    beam_fwhm_x = 100
+    beam_fwhm_y = 100
+    frame_weights = []
+    experiment_list = GetHomogenousExperimentList(\
+        start_mos, k_mos, k_cell, k_bfactor, frames, osc, exposure)
+    WriteDescription(prefix, N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, resolution, \
+    solvent_B, osc, exposure, xtal_size, beam_fwhm_x, beam_fwhm_y, threads, frame_weights)
+    WriteExpQueueAndList(prefix,experiment_list)
+    #RunExperiments(prefix,experiment_list,resolution,solvent_B,threads)
+    # Move files
+    os.system('mv ' + join(mlfsom_path,'input*.pdb ') + output_folder)
+    os.system('mv ' + join(mlfsom_path,'input*.mtz ') + output_folder)
+    os.system('mv ' + join(mlfsom_path,'exp-'+prefix+'*.txt ') + output_folder)
+    print 'ID, mos, bfactor_inc, cell_inc, osc, exposure, sub_xtal_size, sub_beam_size, sub_beam_flux:'
     return experiment_list
 
 
-def WriteExpQueueAndList(experiment_list,prefix):
+def WriteExpQueueAndList(prefix,experiment_list):
     """
     Used by fn: HomogenousCrystal, SpacialDependentCrystal
     Writes list of exps to exp-{prefix}-queue.txt and exp-{prefix}-list.txt
     experiment_list: list of tuples defing exp params:
-    (ID,mos,bfactor_inc,cell_inc,osc)
+    (ID,mos,bfactor_inc,cell_inc,osc,exposure,sub_xtal_size,sub_beam_size,sub_beam_flux)
     prefix: name of exp
     """
     f=open("exp-"+prefix+"-queue.txt","w")
@@ -295,30 +320,31 @@ def ReadExpList(file):
     return exp_list
 
 
-def RunFromExpQueue(prefix,queue_file,N,threads):
+def RunFromExpQueue(prefix,queue_file,N_top,threads):
     """
-    NEEDS TO BE MODIFIED TO ADJUST THE CHANGES IN OTHER FUNCTIONS !!!
     Standalone fn
-    Runs and clears top N frames defined in queue_file
-    queue_file: file listing frames to be generated by mlfsom
-    each frame should be defined by (ID,mos,bfactor_inc,cell_inc,osc)
-    Should be the file exp-{prefix}-queue.img
-    N: number of frames to be run
-    threads: number of frames run at once
+    Runs and clears top N_top frames defined in queue_file
     prefix: images saved as {prefix}###_001.img
+    queue_file: file listing frames to be generated by mlfsom
+    N_top: number of frames to be run
+    threads: number of frames run at once
+    each frame should be defined by:
+    (ID, mos, bfactor_inc, cell_inc, osc, exposure, sub_xtal_size, sub_beam_size, sub_beam_flux)
+    Should be the file exp-{prefix}-queue.img
+    
     Note: frames being run are removed from queue_file
     so if they need to be rerun, copy them over from
     exp-{prefix}-list.img
     """
-    exp_list=[]
+    experiment_list=[]
     with open(queue_file,"r") as f, open("tmp"+queue_file,"w") as out:
-        for i in range(N):
-            exp_list.append(eval(next(f)))
+        for i in range(N_top):
+            experiment_list.append(eval(next(f)))
         for line in f:
             out.write(line)
     os.remove(queue_file)
     os.rename("tmp"+queue_file,queue_file)
-    RunExperiments(prefix,exp_list,resolution,solvent_B,threads)
+    RunExperiments(prefix,experiment_list,resolution=2.5,solvent_B=35,threads=4)
 
 
 def WriteDescription(\
@@ -355,7 +381,7 @@ def WriteDescription(\
 # This does not work correctly
 def RenameTempFiles(experiments_and_prefix,folder):
     """
-    NEEDS TO BE MODIFIED COMPLETELY!!!
+    NEEDS TO BE MODIFIED COMPLETELY, IT DID NOT WORK ANYWAYS!!!
     Used by fn: RunExperiments
     Renames temp txt files (peak intensities) generated by mlfsom to
     more meaningful file names with exp. params 
