@@ -6,7 +6,7 @@ import multiprocessing as mp
 from glob import glob
 
 
-mlfsom_path='/home/hakan/Desktop/MLFSOM'
+mlfsom_path='~/Desktop/MLFSOM'
 tmp_path = '/tmp/hakan/'  # tmp path of the operating sys
 
 
