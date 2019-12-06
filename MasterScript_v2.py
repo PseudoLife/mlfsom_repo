@@ -71,7 +71,7 @@ def GetExperimentList(N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, \
             y_coord = cell[1]*sub_xtal_size
             # decay factor is fractional decay in the int. of the incident beam relative to the max. int
             decay_factor = math.exp(-(x_coord/float(beam_sigma_x))**2/2.0 -(y_coord/float(beam_sigma_y))**2/2.0)
-            sub_beam_flux = decay_factor*8.4e10  # 8.4e10 is mlfsom default for flux
+            sub_beam_flux = round(decay_factor*8.4e10,0)  # 8.4e10 is mlfsom default for flux
             dose = decay_factor*frame
             experiment_list.append(\
                 (ID, round(start_mos+k_mos*dose,3), round(k_bfactor*dose,2),\
@@ -103,13 +103,13 @@ def GetHomogenousExperimentList(start_mos, k_mos, k_cell, k_bfactor, frames, osc
     experiment_list=[]  # tuple(ID,mos,bfactor_inc,cell_inc,frames,osc)
     xtal_size = 77.8  # some exp. constants for homogenous beam case
     beam_size = 100
-    beam_flux = 8.4e10
+    beam_flux = 8.4e+10
     for frame in range(0,frames):
         dose = frame
         ID = len(experiment_list)
         experiment_list.append(\
             (ID, round(start_mos+k_mos*dose,3), round(k_bfactor*dose,2),\
-             round(k_cell*dose,4), osc, exposure, xtal_size, beam_size,beam_flux))
+             round(k_cell*dose,4), osc, exposure, xtal_size, beam_size, beam_flux))
     # experiment_list: (ID,mos,bfactor_inc,cell_inc,osc,exposure,sub_xtal_size,sub_beam_size,sub_beam_flux)
     return experiment_list
 
@@ -182,7 +182,7 @@ def RunExperiment(experiment_and_prefix):
     output_folder = join(mlfsom_path,'data_'+prefix)
     os.system('mkdir --parents ' + output_folder)  # create sub-fol to save output files
     # IS THE PRINT COMMAND BELOW REALLY NECESSARY???
-    print ( ' '.join(['running id='+str(ID), 'mos='+str(mos), \
+    print ( ' '.join(['------- RUNNING ID='+str(ID), 'mos='+str(mos), \
         'bfactor_inc='+str(bfactor_inc), 'cell_inc='+str(cell_inc), \
         'osc='+str(osc), 'exposure='+str(exposure), 'sub_xtal_size='+str(sub_xtal_size), \
         'sub_beam_size='+str(sub_beam_size), 'sub_beam_flux='+str(sub_beam_flux)]) )
@@ -280,7 +280,7 @@ def HomogenousCrystal(prefix,start_mos,k_mos,k_cell,k_bfactor,frames,\
     WriteDescription(prefix, N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, resolution, \
     solvent_B, osc, exposure, xtal_size, beam_fwhm_x, beam_fwhm_y, threads, frame_weights)
     WriteExpQueueAndList(prefix,experiment_list)
-    #RunExperiments(prefix,experiment_list,resolution,solvent_B,threads)
+    RunExperiments(prefix,experiment_list,resolution,solvent_B,threads)
     # Move files
     os.system('mv ' + join(mlfsom_path,'input*.pdb ') + output_folder)
     os.system('mv ' + join(mlfsom_path,'input*.mtz ') + output_folder)
