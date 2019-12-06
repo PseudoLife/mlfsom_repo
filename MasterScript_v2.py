@@ -31,7 +31,7 @@ def GetExperimentList(N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, \
 
     Note: dose = frame-no*decay-factor where decay-factor is exp(-(x**2+y**2)/(2*sigma**2))
     Returns tuple of list of params for exps to be calc by mlfsom:
-    (ID,mos,bfactor_inc,cell_inc,osc,exposure,sub_xtal_size,sub_beam_size)
+    (ID,mos,bfactor_inc,cell_inc,osc,sub_exposure,sub_xtal_size,sub_beam_size)
     and list of weights to each set of exp on each frame, frame_weights:
     (frame,weight,exp_ID)
     """
@@ -60,7 +60,7 @@ def GetExperimentList(N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, \
 
     # calculate dose in each cell for each frame and params for each cell
     experiment_list = []
-    # tuple (ID,mos,bfactor_inc,cell_inc,osc,exposure,sub_xtal_size,sub_beam_size)
+    # tuple (ID,mos,bfactor_inc,cell_inc,osc,sub_exposure,sub_xtal_size,sub_beam_size)
     frame_weights = []
     # tuple (frame,weight,experiment_ID)
     for frame in range(0,frames):
@@ -71,12 +71,13 @@ def GetExperimentList(N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, \
             y_coord = cell[1]*sub_xtal_size
             # decay factor is fractional decay in the int. of the incident beam relative to the max. int
             decay_factor = math.exp(-(x_coord/float(beam_sigma_x))**2/2.0 -(y_coord/float(beam_sigma_y))**2/2.0)
-            dose = decay_factor*frame
+            dose = frame*decay_factor
+            sub_exposure = exposure*decay_factor 
             experiment_list.append(\
                 (ID, round(start_mos+k_mos*dose,3), round(k_bfactor*dose,2),\
-                 round(k_cell*dose,4), osc, exposure, sub_xtal_size, sub_beam_size))
+                 round(k_cell*dose,4), osc, sub_exposure, sub_xtal_size, sub_beam_size))
     
-    # experiment_list: (ID,mos,bfactor_inc,cell_inc,osc,exposure,sub_xtal_size,sub_beam_size)
+    # experiment_list: (ID,mos,bfactor_inc,cell_inc,osc,sub_exposure,sub_xtal_size,sub_beam_size)
     # frame_wights: (frame,weight,experiment_ID)
     return (frame_weights,experiment_list)
 
@@ -97,9 +98,9 @@ def GetHomogenousExperimentList(start_mos, k_mos, k_cell, k_bfactor, frames, osc
 
     Note: the dose in each frame is given by frame*1
     Returns list of params for exps to be calc by mlfsom:
-    (ID,mos,bfactor_inc,cell_inc,osc,exposure)
+    (ID,mos,bfactor_inc,cell_inc,osc,exposure,xtal_size,beam_size)
     """
-    experiment_list=[]  # tuple(ID,mos,bfactor_inc,cell_inc,osc,exposure,sub_xtal_size,sub_beam_size)
+    experiment_list=[]  # tuple(ID,mos,bfactor_inc,cell_inc,osc,sub_exposure,sub_xtal_size,sub_beam_size)
     xtal_size = 77.8  # some exp. constants for homogenous beam case
     beam_size = 100
     for frame in range(0,frames):
@@ -108,7 +109,7 @@ def GetHomogenousExperimentList(start_mos, k_mos, k_cell, k_bfactor, frames, osc
         experiment_list.append(\
             (ID, round(start_mos+k_mos*dose,3), round(k_bfactor*dose,2),\
              round(k_cell*dose,4), osc, exposure, xtal_size, beam_size))
-    # experiment_list: (ID,mos,bfactor_inc,cell_inc,osc,exposure,sub_xtal_size,sub_beam_size)
+    # experiment_list: (ID,mos,bfactor_inc,cell_inc,osc,sub_exposure,sub_xtal_size,sub_beam_size)
     return experiment_list
 
 
@@ -173,19 +174,19 @@ def RunExperiment(experiment_and_prefix):
     Images are saved as {prefix}###_001.img, where ### is the ID
     e.g. prefix = mseq and ID = 1, img => mseq1_001.img
     """
-    # (ID,mos,bfactor_inc,cell_inc,osc,exposure,sub_xtal_size,sub_beam_size)
+    # (ID,mos,bfactor_inc,cell_inc,osc,sub_exposure,sub_xtal_size,sub_beam_size)
     experiment = experiment_and_prefix[0]
     prefix = experiment_and_prefix[1]
-    ID,mos,bfactor_inc,cell_inc,osc,exposure,sub_xtal_size,sub_beam_size = experiment
+    ID,mos,bfactor_inc,cell_inc,osc,sub_exposure,sub_xtal_size,sub_beam_size = experiment
     output_folder = join(mlfsom_path,'data_'+prefix)
     os.system('mkdir --parents ' + output_folder)  # create sub-fol to save output files
     # IS THE PRINT COMMAND BELOW REALLY NECESSARY???
     print ( ' '.join(['------- RUNNING ID='+str(ID), 'mos='+str(mos), 'bfactor_inc='+str(bfactor_inc),\
-        'cell_inc='+str(cell_inc), 'osc='+str(osc), 'exposure='+str(exposure), \
+        'cell_inc='+str(cell_inc), 'osc='+str(osc), 'sub_exposure='+str(sub_exposure), \
         'sub_xtal_size='+str(sub_xtal_size), 'sub_beam_size='+str(sub_beam_size)]) )
     subprocess.call([\
         './mlfsom.com', join(output_folder,prefix+str(ID)+'_001.img'), 'input'+str(ID)+'.mtz',\
-        'frames=1', 'id='+str(ID), 'mosaic='+str(mos), 'osc='+str(osc), 'exposure='+str(exposure), \
+        'frames=1', 'id='+str(ID), 'mosaic='+str(mos), 'osc='+str(osc), 'exposure='+str(sub_exposure), \
         'xtal_size='+str(sub_xtal_size), 'beam_size='+str(sub_beam_size)])
     print('---- ID: '+str(ID)+' DONE ----')
 
@@ -233,7 +234,7 @@ def SpacialDependentCrystal(prefix,N_grid,start_mos,k_mos,k_cell,k_bfactor,\
     os.system('mv ' + join(mlfsom_path,'input*.pdb ') + output_folder)
     os.system('mv ' + join(mlfsom_path,'input*.mtz ') + output_folder)
     os.system('mv ' + join(mlfsom_path,'exp-'+prefix+'*.txt ') + output_folder)
-    print 'ID, mos, bfactor_inc, cell_inc, osc, exposure, sub_xtal_size, sub_beam_size:'
+    print 'ID, mos, bfactor_inc, cell_inc, osc, sub_exposure, sub_xtal_size, sub_beam_size:'
     return experiment_list
 
 
@@ -282,7 +283,7 @@ def HomogenousCrystal(prefix,start_mos,k_mos,k_cell,k_bfactor,frames,\
     os.system('mv ' + join(mlfsom_path,'input*.pdb ') + output_folder)
     os.system('mv ' + join(mlfsom_path,'input*.mtz ') + output_folder)
     os.system('mv ' + join(mlfsom_path,'exp-'+prefix+'*.txt ') + output_folder)
-    print 'ID, mos, bfactor_inc, cell_inc, osc, exposure, sub_xtal_size, sub_beam_size:'
+    print 'ID, mos, bfactor_inc, cell_inc, osc, sub_exposure, sub_xtal_size, sub_beam_size:'
     return experiment_list
 
 
@@ -291,7 +292,7 @@ def WriteExpQueueAndList(prefix,experiment_list):
     Used by fn: HomogenousCrystal, SpacialDependentCrystal
     Writes list of exps to exp-{prefix}-queue.txt and exp-{prefix}-list.txt
     experiment_list: list of tuples defing exp params:
-    (ID,mos,bfactor_inc,cell_inc,osc,exposure,sub_xtal_size,sub_beam_size)
+    (ID,mos,bfactor_inc,cell_inc,osc,sub_exposure,sub_xtal_size,sub_beam_size)
     prefix: name of exp
     """
     f=open("exp-"+prefix+"-queue.txt","w")
@@ -326,7 +327,7 @@ def RunFromExpQueue(prefix,queue_file,N_top,threads):
     N_top: number of frames to be run
     threads: number of frames run at once
     each frame should be defined by:
-    (ID, mos, bfactor_inc, cell_inc, osc, exposure, sub_xtal_size, sub_beam_size)
+    (ID, mos, bfactor_inc, cell_inc, osc, sub_exposure, sub_xtal_size, sub_beam_size)
     Should be the file exp-{prefix}-queue.img
     
     Note: frames being run are removed from queue_file
