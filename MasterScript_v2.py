@@ -7,7 +7,7 @@ from glob import glob
 
 
 mlfsom_path='~/Desktop/MLFSOM'
-tmp_path = '/tmp/hakan/'  # tmp path of the operating sys
+tmp_path = '/tmp/peter/'  # tmp path of the operating sys
 
 
 def GetExperimentList(N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, \
