@@ -1,0 +1,17 @@
+experiment: homo_exp
+N_grid: None
+start mos: 0.05
+k_mos: 0.1
+k_cell: 0.001
+k_bfactor: 2
+frames: 1
+resolution: 2.5
+solvent_B: 35
+osc: 0.01
+exposure: 0.1
+crystal_size: 77.8
+beam_fwhm_x: 100
+beam_fwhm_y: 100
+threads: 4
+exp list weights:
+(frame,weight,experiment_ID)
