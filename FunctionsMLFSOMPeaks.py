@@ -6,8 +6,6 @@ import numpy as np
 from glob import glob
 from matplotlib.ticker import AutoMinorLocator
 
-import toPrecision
-reload(toPrecision)
 from toPrecision import toPrecision
 
 cell_a = 77.25
