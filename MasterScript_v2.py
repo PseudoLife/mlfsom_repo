@@ -355,7 +355,7 @@ def WriteDescription(\
     f=open("exp-"+prefix+"-desc.txt","w")
     f.write("experiment: "+prefix+"\n")
     f.write("N_grid: "+str(N_grid)+"\n")
-    f.write("start mos: "+str(start_mos)+"\n")
+    f.write("start_mos: "+str(start_mos)+"\n")
     f.write("k_mos: "+str(k_mos)+"\n")
     f.write("k_cell: "+str(k_cell)+"\n")
     f.write("k_bfactor: "+str(k_bfactor)+"\n")
@@ -368,7 +368,7 @@ def WriteDescription(\
     f.write("beam_fwhm_x: "+str(beam_fwhm_x)+"\n")
     f.write("beam_fwhm_y: "+str(beam_fwhm_y)+"\n")
     f.write("threads: "+str(threads)+"\n")
-    f.write("exp list weights:"+"\n")
+    f.write("exp_list_weights:"+"\n")
     f.write("(frame,weight,experiment_ID)"+"\n")
     
     for i in frame_weights:
