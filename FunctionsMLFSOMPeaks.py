@@ -229,3 +229,93 @@ def PlotShellIntensities(df_mlfsomPeaks,N_shells=10):
 	plt.show()
 
 	return df_shells
+
+
+def AggregateCustomFramesPeakIntensities(image_folder,start_frame_id,end_frame_id):
+	"""
+	Gaussian beam only
+	Takes an image folder of .XYI files and a custom range of frame ids
+	Returns combined intensties i.e. it frame id's are supposed to belong to the same macro frame
+	Start and end id's inclusive
+	"""
+	owd = os.getcwd()
+	os.chdir(image_folder) # change wd for now, change back to owd at the end
+
+	df_peaks = pd.DataFrame()
+	XYI_file_list = [fi for fi in os.listdir('.') if fi.endswith('.XYI')]
+	for XYI_file in XYI_file_list:
+		fnumber = int(XYI_file.split('_')[1][8::]) # frame id
+		if fnumber >= start_frame_id and fnumber <= end_frame_id:
+			df_hkl = ReadSingleXYI(XYI_file)
+			df_hkl.rename(columns={'I':fnumber,'hor':'hor_'+str(fnumber),'ver':'ver_'+str(fnumber),\
+				'res':'res_'+str(fnumber)},inplace=True)
+			df_peaks = df_peaks.join(df_hkl, how='outer')
+
+	# Add average I, hor, ver and res columns
+	intensity_cols = [col for col in df_peaks.columns if type(col)==int]
+	df_peaks['I-sum'] = np.nansum(df_peaks[intensity_cols],axis=1)
+
+	hor_cols = [col for col in df_peaks.columns if type(col)==str and col.startswith('hor_')]
+	df_peaks['hor'] = np.nanmean(df_peaks[hor_cols],axis=1)
+
+	ver_cols = [col for col in df_peaks.columns if type(col)==str and col.startswith('ver_')]
+	df_peaks['ver'] = np.nanmean(df_peaks[ver_cols],axis=1)
+
+	res_cols = [col for col in df_peaks.columns if type(col)==str and col.startswith('res_')]
+	df_peaks['res'] = np.nanmean(df_peaks[res_cols],axis=1)	
+
+	# Return only avg. hor, ver, res, int and int for each frame
+	keep_cols = ['hor','ver','res'] + np.sort([col for col in df_peaks.columns if type(col)==int]).tolist() + ['I-sum']
+	df_peaks = df_peaks[keep_cols]
+	df_peaks.sort_values('I-sum',ascending=False,inplace=True) # sort by average int. of peaks
+	
+	os.chdir(owd)
+	return df_peaks
+
+
+def ReadGaussianPeakIntensities(image_folder):
+	"""
+	Gaussian beam only
+	Takes image_folder of a Gaussian beam run
+	Returns peaks with combined (summed) intensities from different IDs
+	image_folder should have the exp. desc file e.g. exp-gaussian_N4_1.5A-desc.txt
+	"""
+	owd = os.getcwd()
+	os.chdir(image_folder) # change wd for now, change back to owd at the end
+
+	desc_file = glob(join(image_folder,'exp-*desc.txt'))[0]
+	desc_df = pd.read_csv(desc_file,nrows=15,sep=': ',header=None,\
+		index_col=0,engine='python',names=['param','value'])
+	N_grid = int(desc_df.loc['N_grid','value'])
+	frames_per_macro = N_grid*(N_grid+2)/8
+	N_macros = int(desc_df.loc['frames','value'])
+	begin_id = 0
+	df_peaks = pd.DataFrame()
+ 	for macro_num in range(N_macros):
+		df_macro = AggregateCustomFramesPeakIntensities(image_folder,begin_id,begin_id+frames_per_macro-1)
+		df_macro.drop(columns=[col for col in df_macro.columns if type(col)==int],inplace=True)
+		df_macro.rename(columns={'I-sum':macro_num,'hor':'hor_'+str(macro_num),'ver':'ver_'+str(macro_num),\
+			'res':'res_'+str(macro_num)},inplace=True)
+		df_peaks = df_peaks.join(df_macro, how='outer')
+		begin_id += frames_per_macro
+
+	# Add average I, hor, ver and res columns
+	intensity_cols = [col for col in df_peaks.columns if type(col)==int]
+	df_peaks['I-avg'] = np.nanmean(df_peaks[intensity_cols],axis=1)
+
+	hor_cols = [col for col in df_peaks.columns if type(col)==str and col.startswith('hor_')]
+	df_peaks['hor'] = np.nanmean(df_peaks[hor_cols],axis=1)
+
+	ver_cols = [col for col in df_peaks.columns if type(col)==str and col.startswith('ver_')]
+	df_peaks['ver'] = np.nanmean(df_peaks[ver_cols],axis=1)
+
+	res_cols = [col for col in df_peaks.columns if type(col)==str and col.startswith('res_')]
+	df_peaks['res'] = np.nanmean(df_peaks[res_cols],axis=1)	
+
+	# Return only avg. hor, ver, res, int and int for each macro-frame
+	keep_cols = ['hor','ver','res'] + np.sort([col for col in df_peaks.columns if type(col)==int]).tolist() + ['I-avg']
+	df_peaks = df_peaks[keep_cols]
+	df_peaks.sort_values('I-avg',ascending=False,inplace=True) # sort by average int. of peaks
+
+	os.chdir(owd)
+	return df_peaks
