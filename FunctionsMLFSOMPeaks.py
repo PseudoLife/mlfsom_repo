@@ -239,11 +239,27 @@ def AggregateCustomFramesPeakIntensities(image_folder,start_frame_id,end_frame_i
 	"""
 	Gaussian beam only
 	Takes an image folder of .XYI files and a custom range of frame ids
-	Returns combined intensties i.e. it frame id's are supposed to belong to the same macro frame
+	Returns weighted sum of intensties
+	Image_folder should have the exp. desc file e.g. exp-gaussian_N4_1.5A-desc.txt...
+	which has the weights of each frame id
 	Start and end id's inclusive
 	"""
 	owd = os.getcwd()
 	os.chdir(image_folder) # change wd for now, change back to owd at the end
+
+	# Get the line where (frame,weight,experiment) starts
+	desc_file = glob(join(image_folder,'exp-*desc.txt'))[0]
+	with open(desc_file) as myfile:
+		line_list = myfile.readlines()
+		for line_num, line in enumerate(line_list):
+			if "frame" in line and "weight" in line and "experiment_ID" in line:
+				start_line_num = line_num
+				break
+	# Read in ID's and weights of the frames 
+	df_weights = pd.read_csv(desc_file,header=None,skiprows=start_line_num+1,\
+		names=['macro','weight','ID'],index_col=2)
+	df_weights.index = df_weights.index.str.replace(')','').astype(int)
+	df_weights.macro = df_weights.macro.str.replace('(','').astype(int)
 
 	df_peaks = pd.DataFrame()
 	XYI_file_list = [fi for fi in os.listdir('.') if fi.endswith('.XYI')]
@@ -255,9 +271,14 @@ def AggregateCustomFramesPeakIntensities(image_folder,start_frame_id,end_frame_i
 				'res':'res_'+str(fnumber)},inplace=True)
 			df_peaks = df_peaks.join(df_hkl, how='outer')
 
-	# Add average I, hor, ver and res columns
+	# Add weighted average I, and basic average for hor, ver and res columns
+	# I don't bother with weighted average for hor, ver and res columns as they don't change much
 	intensity_cols = [col for col in df_peaks.columns if type(col)==int]
-	df_peaks['I-sum'] = np.nansum(df_peaks[intensity_cols],axis=1)
+	weighted_I_sum = pd.Series([0]*len(df_peaks)) # initialize weighted sum with zeros
+	for fnumber in intensity_cols:
+		weighted_I_sum = np.nansum(\
+			[weighted_I_sum, df_peaks[fnumber]*df_weights.loc[fnumber,'weight']],axis=0)
+	df_peaks['I-sum'] = weighted_I_sum
 
 	hor_cols = [col for col in df_peaks.columns if type(col)==str and col.startswith('hor_')]
 	df_peaks['hor'] = np.nanmean(df_peaks[hor_cols],axis=1)
