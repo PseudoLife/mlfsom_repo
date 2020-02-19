@@ -1,2 +1,10 @@
 .DS_Store
 *.pyc
+
+absolute_scale.map
+ano_sfall_debug.log
+sharp_solvent.map
+smooth_FC.txt
+solvent_asu.map
+unsmooth_FC.txt
+
