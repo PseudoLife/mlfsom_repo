@@ -1,0 +1,13 @@
+experiment - highestres_highB
+N=1
+Start Mos=0.05
+k_mos=0.05
+k_cell=0.0005
+k_bfactor=2
+beam_func=top-hat
+frames=20
+frame_rate=1
+angle_slices=1
+osc=0.01
+exp list weights:
+(frame,weight,experiment_ID)

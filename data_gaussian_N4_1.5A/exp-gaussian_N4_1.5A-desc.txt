@@ -1,6 +1,6 @@
 experiment: gaussian_N4_1.5A
 N_grid: 4
-start mos: 0.05
+start_mos: 0.05
 k_mos: 0.2
 k_cell: 0.002
 k_bfactor: 8
@@ -13,7 +13,7 @@ crystal_size: 300
 beam_fwhm_x: 100
 beam_fwhm_y: 100
 threads: 16
-exp list weights:
+exp_list_weights:
 (frame,weight,experiment_ID)
 (0, 4, 0)
 (0, 8, 1)
