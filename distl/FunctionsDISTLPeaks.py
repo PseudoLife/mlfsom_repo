@@ -42,7 +42,7 @@ def ReadDISTLPeakIntensities(image_folder,header_contents,distl_params):
 	# sort img_list by numerical value of frame number
 	img_list = sorted(img_list, key=lambda x: int(x.split('_')[-2]))
 	dic_peaks = {} # stores individual peak intensities
-	eps = 5 # two peaks are considered same if within +/- eps in x and y
+	eps = 7 # two peaks are considered same if within +/- eps in x and y
 
 	for fake_img in img_list:
 		fnumber = int(fake_img.split('_')[-2])
@@ -166,7 +166,7 @@ def MlfsomVSdistl(dataframe_mlfsom,dataframe_distl,fnumber):
 	sub_distl = df_distl[~df_distl[fnumber].isna()][['y','x',fnumber]]
 	sub_distl.sort_values(fnumber,ascending=False,inplace=True)
 
-	eps = 5  # two peaks are considered same if within +/- eps in x and y
+	eps = 7  # two peaks are considered same if within +/- eps in x and y
 	for hkl in sub_peaks.index:
 		hor,ver,I_peak = sub_peaks.loc[hkl][['hor','ver',fnumber]]
 		match =	sub_distl[sub_distl.y.between(hor-eps,hor+eps) & sub_distl.x.between(ver-eps,ver+eps)]
