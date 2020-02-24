@@ -1,0 +1,58 @@
+DIALS (2018) Acta Cryst. D74, 85-97. https://doi.org/10.1107/S2059798317017235
+DIALS 1.14.5-g19190e3b9-release
+The following parameters have been modified:
+
+input {
+  datablock = <image files>
+}
+
+--------------------------------------------------------------------------------
+  format: <class 'dxtbx.format.FormatCBFMiniPilatusCHESS_6MSN127.FormatCBFMiniPilatusCHESS_6MSN127'>
+  num images: 1
+  num sweeps: 1
+  num stills: 0
+
+Sweep 0
+  Length 1
+Beam:
+    wavelength: 1
+    sample to source direction : {0,0,1}
+    divergence: 0
+    sigma divergence: 0
+    polarization normal: {0,1,0}
+    polarization fraction: 0.999
+
+Goniometer:
+    Rotation axis:   {-1,0,0}
+    Fixed rotation:  {1,0,0,0,1,0,0,0,1}
+    Setting rotation:{1,0,0,0,1,0,0,0,1}
+
+Detector:
+Panel:
+  name: Panel
+  type: SENSOR_PAD
+  identifier: 
+  pixel_size:{0.172,0.172}
+  image_size: {2463,2527}
+  trusted_range: {-1,1.14714e+06}
+  thickness: 1
+  material: Si
+  mu: 4.20798
+  gain: 1
+  pedestal: 0
+  fast_axis: {1,0,0}
+  slow_axis: {0,-1,0}
+  origin: {-217.3,211.799,-250.432}
+  distance: 250.432
+  pixel to millimeter strategy: ParallaxCorrectedPxMmStrategy
+    mu: 4.20798
+    t0: 1
+
+
+Scan:
+    image range:   {1,1}
+    oscillation:   {342,0.01}
+    exposure time: 0.1
+
+--------------------------------------------------------------------------------
+Writing datablocks to datablock.json
