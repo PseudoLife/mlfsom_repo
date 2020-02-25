@@ -10,7 +10,8 @@ from toPrecision import toPrecision
 import FunctionsMLFSOMPeaks as myfunc
 
 #image_folder = '/Users/atakisi/Desktop/MLFSOM/data_gaussian_N6_1.5A'
-image_folder = '/Users/atakisi/Desktop/MLFSOM/data_homo_mosOff_finer_Newbie'
+#image_folder = '/Users/atakisi/Desktop/MLFSOM/data_homo_mosOff_finer_Newbie'
+image_folder = '/home/peter/Desktop/MLFSOM/data_homo_mosOff_1.2A_10fr'
 
 #df_peaks = myfunc.ReadGaussianPeakIntensities(image_folder)
 df_peaks = myfunc.ReadPeakIntensities(image_folder)
@@ -25,8 +26,8 @@ d_space = df_shells.d_max*0.5+df_shells.d_min*0.5
 D_half = df_shells.D_half
 plt.scatter(d_space,D_half,edgecolors='black',s=150)
 # fitting line
-x = np.linspace(1.4, 5.4, 100)
-K = 0.7
+x = np.linspace(1.2, 5.4, 100)
+K = 0.36
 y = K * x**2
 ax.plot(x, y, linestyle = '--', color='tab:red', linewidth=2)
 
@@ -49,7 +50,5 @@ ax.set_facecolor('0.95')
 for axis in ['top','bottom','left','right']: ax.spines[axis].set_visible(False)
 plt.tight_layout()
 
-fig.savefig('fig_DhalfvsRes',dpi=300)
+#fig.savefig('fig_DhalfvsRes',dpi=300)
 plt.show()
-
-
