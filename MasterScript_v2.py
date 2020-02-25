@@ -1,5 +1,5 @@
 from math import *
-import os, time, math
+import os, time, math, tempfile
 from os.path import join
 import subprocess
 import multiprocessing as mp
@@ -7,7 +7,8 @@ from glob import glob
 import pandas as pd
 
 mlfsom_path='~/Desktop/MLFSOM'
-tmp_path = '/tmp/peter/'  # tmp path of the operating sys
+tmp_path = join(tempfile.gettempdir(), os.environ.get('USER'))
+#tmp_path = '/tmp/peter/'  # tmp path of the operating sys
 
 
 def GetExperimentList(N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, \
