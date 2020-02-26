@@ -38,17 +38,20 @@ def ReadPeakIntensities(image_folder):
 	"""
 	Takes an image folder of .XYI files and outputs a data frame with
 	hkl, peak intensities, hor and ver coords, resolution etc. 
+	Skips missing or corrupted XYI files
 	"""
 	owd = os.getcwd()
 	os.chdir(image_folder) # change wd for now, change back to owd at the end
 
 	df_peaks = pd.DataFrame()
 	for XYI_file in glob('mlfsom_tempfile*.XYI'):
-		fnumber = int(XYI_file.split('_')[1][8::]) # fnumber is a two digit str, format '07' or '26'
-		df_hkl = ReadSingleXYI(XYI_file)
-		df_hkl.rename(columns={'I':fnumber,'hor':'hor_'+str(fnumber),'ver':'ver_'+str(fnumber),\
-			'res':'res_'+str(fnumber)},inplace=True)
-		df_peaks = df_peaks.join(df_hkl, how='outer')
+		# skip corrupted XYI files whose size is 0 bytes
+		if os.path.getsize(XYI_file) != 0:
+			fnumber = int(XYI_file.split('_')[1][8::]) # fnumber is a two digit str, format '07' or '26'
+			df_hkl = ReadSingleXYI(XYI_file)
+			df_hkl.rename(columns={'I':fnumber,'hor':'hor_'+str(fnumber),'ver':'ver_'+str(fnumber),\
+				'res':'res_'+str(fnumber)},inplace=True)
+			df_peaks = df_peaks.join(df_hkl, how='outer')
 
 	# Add average I, hor, ver and res columns
 	intensity_cols = [col for col in df_peaks.columns if type(col)==int]
@@ -243,6 +246,7 @@ def AggregateCustomFramesPeakIntensities(image_folder,start_frame_id,end_frame_i
 	Image_folder should have the exp. desc file e.g. exp-gaussian_N4_1.5A-desc.txt...
 	which has the weights of each frame id
 	Start and end id's inclusive
+	Returns None if there is any missing or corrupted XYI file between start and end id
 	"""
 	owd = os.getcwd()
 	os.chdir(image_folder) # change wd for now, change back to owd at the end
@@ -263,16 +267,22 @@ def AggregateCustomFramesPeakIntensities(image_folder,start_frame_id,end_frame_i
 
 	df_peaks = pd.DataFrame()
 	XYI_file_list = [fi for fi in os.listdir('.') if fi.endswith('.XYI')]
-	for XYI_file in XYI_file_list:
-		fnumber = int(XYI_file.split('_')[1][8::]) # frame id
-		if fnumber >= start_frame_id and fnumber <= end_frame_id:
+	for fnumber in range(start_frame_id,end_frame_id+1):
+		XYI_file = 'mlfsom_tempfile'+str(fnumber)+'_preds_1.XYI'
+		# XYI_file is None if there is any missing XYI file between start_id and end_id
+		if not os.path.isfile(XYI_file) or os.path.getsize(XYI_file) == 0:
+			print "WARNING: At least one XYI file between frames %i-%i missing or corrupted" \
+			%(start_frame_id,end_frame_id)
+			return None
+		else:
 			df_hkl = ReadSingleXYI(XYI_file)
 			df_hkl.rename(columns={'I':fnumber,'hor':'hor_'+str(fnumber),'ver':'ver_'+str(fnumber),\
 				'res':'res_'+str(fnumber)},inplace=True)
 			df_peaks = df_peaks.join(df_hkl, how='outer')
 
 	# Add weighted average I, and basic average for hor, ver and res columns
-	# I don't bother with weighted average for hor, ver and res columns as they don't change much
+	# PS: I don't bother with weighted average for hor, ver and res columns as... 
+	# they don't vary much from frame to frame
 	intensity_cols = [col for col in df_peaks.columns if type(col)==int]
 	weighted_I_sum = pd.Series([0]*len(df_peaks)) # initialize weighted sum with zeros
 	for fnumber in intensity_cols:
@@ -304,12 +314,13 @@ def ReadGaussianPeakIntensities(image_folder):
 	Takes image_folder of a Gaussian beam run
 	Returns peaks with combined (summed) intensities from different IDs
 	image_folder should have the exp. desc file e.g. exp-gaussian_N4_1.5A-desc.txt
+	Skips the macro frames whose at least one XYI file is missing or corrupted
 	"""
 	owd = os.getcwd()
 	os.chdir(image_folder) # change wd for now, change back to owd at the end
 
 	desc_file = glob(join(image_folder,'exp-*desc.txt'))[0]
-	desc_df = pd.read_csv(desc_file,nrows=15,sep=': ',header=None,\
+	desc_df = pd.read_csv(desc_file,sep=': ',header=None,\
 		index_col=0,engine='python',names=['param','value'])
 	N_grid = int(desc_df.loc['N_grid','value'])
 	frames_per_macro = N_grid*(N_grid+2)/8
@@ -318,10 +329,12 @@ def ReadGaussianPeakIntensities(image_folder):
 	df_peaks = pd.DataFrame()
  	for macro_num in range(N_macros):
 		df_macro = AggregateCustomFramesPeakIntensities(image_folder,begin_id,begin_id+frames_per_macro-1)
-		df_macro.drop(columns=[col for col in df_macro.columns if type(col)==int],inplace=True)
-		df_macro.rename(columns={'I-sum':macro_num,'hor':'hor_'+str(macro_num),'ver':'ver_'+str(macro_num),\
-			'res':'res_'+str(macro_num)},inplace=True)
-		df_peaks = df_peaks.join(df_macro, how='outer')
+		# df_macro is None if any missing XYI files between start and end ids
+		if type(df_macro) == pd.core.frame.DataFrame:
+			df_macro.drop(columns=[col for col in df_macro.columns if type(col)==int],inplace=True)
+			df_macro.rename(columns={'I-sum':macro_num,'hor':'hor_'+str(macro_num),'ver':'ver_'+str(macro_num),\
+				'res':'res_'+str(macro_num)},inplace=True)
+			df_peaks = df_peaks.join(df_macro, how='outer')
 		begin_id += frames_per_macro
 
 	# Add average I, hor, ver and res columns
