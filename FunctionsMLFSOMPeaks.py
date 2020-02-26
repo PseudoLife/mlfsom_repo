@@ -38,17 +38,20 @@ def ReadPeakIntensities(image_folder):
 	"""
 	Takes an image folder of .XYI files and outputs a data frame with
 	hkl, peak intensities, hor and ver coords, resolution etc. 
+	Skips missing or corrupted XYI files
 	"""
 	owd = os.getcwd()
 	os.chdir(image_folder) # change wd for now, change back to owd at the end
 
 	df_peaks = pd.DataFrame()
 	for XYI_file in glob('mlfsom_tempfile*.XYI'):
-		fnumber = int(XYI_file.split('_')[1][8::]) # fnumber is a two digit str, format '07' or '26'
-		df_hkl = ReadSingleXYI(XYI_file)
-		df_hkl.rename(columns={'I':fnumber,'hor':'hor_'+str(fnumber),'ver':'ver_'+str(fnumber),\
-			'res':'res_'+str(fnumber)},inplace=True)
-		df_peaks = df_peaks.join(df_hkl, how='outer')
+		# skip corrupted XYI files whose size is 0 bytes
+		if os.path.getsize(XYI_file) != 0:
+			fnumber = int(XYI_file.split('_')[1][8::]) # fnumber is a two digit str, format '07' or '26'
+			df_hkl = ReadSingleXYI(XYI_file)
+			df_hkl.rename(columns={'I':fnumber,'hor':'hor_'+str(fnumber),'ver':'ver_'+str(fnumber),\
+				'res':'res_'+str(fnumber)},inplace=True)
+			df_peaks = df_peaks.join(df_hkl, how='outer')
 
 	# Add average I, hor, ver and res columns
 	intensity_cols = [col for col in df_peaks.columns if type(col)==int]
@@ -243,7 +246,7 @@ def AggregateCustomFramesPeakIntensities(image_folder,start_frame_id,end_frame_i
 	Image_folder should have the exp. desc file e.g. exp-gaussian_N4_1.5A-desc.txt...
 	which has the weights of each frame id
 	Start and end id's inclusive
-	Returns None if there is any missing XYI file between start and end id
+	Returns None if there is any missing or corrupted XYI file between start and end id
 	"""
 	owd = os.getcwd()
 	os.chdir(image_folder) # change wd for now, change back to owd at the end
@@ -266,9 +269,9 @@ def AggregateCustomFramesPeakIntensities(image_folder,start_frame_id,end_frame_i
 	XYI_file_list = [fi for fi in os.listdir('.') if fi.endswith('.XYI')]
 	for fnumber in range(start_frame_id,end_frame_id+1):
 		XYI_file = 'mlfsom_tempfile'+str(fnumber)+'_preds_1.XYI'
-		# return None if there is any missing XYI file between start_id and end_id
-		if not os.path.isfile(XYI_file):
-			print "WARNING: At least one XYI file between the frames %i-%i is missing" \
+		# XYI_file is None if there is any missing XYI file between start_id and end_id
+		if not os.path.isfile(XYI_file) or os.path.getsize(XYI_file) == 0:
+			print "WARNING: At least one XYI file between frames %i-%i missing or corrupted" \
 			%(start_frame_id,end_frame_id)
 			return None
 		else:
@@ -311,7 +314,7 @@ def ReadGaussianPeakIntensities(image_folder):
 	Takes image_folder of a Gaussian beam run
 	Returns peaks with combined (summed) intensities from different IDs
 	image_folder should have the exp. desc file e.g. exp-gaussian_N4_1.5A-desc.txt
-	Skips the macro frames whose at least one XYI file is missing
+	Skips the macro frames whose at least one XYI file is missing or corrupted
 	"""
 	owd = os.getcwd()
 	os.chdir(image_folder) # change wd for now, change back to owd at the end
