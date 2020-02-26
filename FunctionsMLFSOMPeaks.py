@@ -264,15 +264,6 @@ def AggregateCustomFramesPeakIntensities(image_folder,start_frame_id,end_frame_i
 
 	df_peaks = pd.DataFrame()
 	XYI_file_list = [fi for fi in os.listdir('.') if fi.endswith('.XYI')]
-	"""
-	for XYI_file in XYI_file_list:
-		fnumber = int(XYI_file.split('_')[1][8::]) # frame id
-		if fnumber >= start_frame_id and fnumber <= end_frame_id:
-			df_hkl = ReadSingleXYI(XYI_file)
-			df_hkl.rename(columns={'I':fnumber,'hor':'hor_'+str(fnumber),'ver':'ver_'+str(fnumber),\
-				'res':'res_'+str(fnumber)},inplace=True)
-			df_peaks = df_peaks.join(df_hkl, how='outer')
-	"""
 	for fnumber in range(start_frame_id,end_frame_id+1):
 		XYI_file = 'mlfsom_tempfile'+str(fnumber)+'_preds_1.XYI'
 		# return None if there is any missing XYI file between start_id and end_id
