@@ -1,0 +1,108 @@
+<B><FONT COLOR="#FF0000"><!--SUMMARY_BEGIN-->
+<html> <!-- CCP4 HTML LOGFILE -->
+<hr>
+<!--SUMMARY_END--></FONT></B>
+<B><FONT COLOR="#FF0000"><!--SUMMARY_BEGIN-->
+<pre>
+ 
+ ###############################################################
+ ###############################################################
+ ###############################################################
+ ### CCP4 7.0.000: UNIQUE           version 7.0.000 :         ##
+ ###############################################################
+ User: unknown  Run date:  4/ 3/2020 Run time: 14:05:29 
+
+
+ Please reference: Collaborative Computational Project, Number 4. 2011.
+ "Overview of the CCP4 suite and current developments". Acta Cryst. D67, 235-242.
+ as well as any specific reference in the program write-up.
+
+<!--SUMMARY_END--></FONT></B>
+ Data line--- RESO 1000
+ Data line--- SYMM 96
+ Data line--- CELL 77.2500 77.2500 38.6600 90.0000 90.0000 90.0000
+Reciprocal space symmetry: 
+Space group: "P 43 21 2" Point group: "PG422" Laue group: "4/mmm" 
+Reference asymmetric unit: "h>=k and k>=0 and l>=0" 
+  (change of basis may be applied) 
+
+ Spacegroup 96 "P 43 21 2" 
+ Original indices for reflection hkl with symmetry number ISYM 
+
+                              Bijvoet positive 
+       ISYM              ISYM              ISYM              ISYM              
+  ISYM   1  +h,+k,+l       3  -k,+h,+l       5  -h,-k,+l       7  +k,-h,+l    
+  ISYM   9  +h,-k,-l      11  +k,+h,-l      13  -h,+k,-l      15  -k,-h,-l    
+
+                              Bijvoet negative 
+       ISYM              ISYM              ISYM              ISYM              
+  ISYM   2  -h,-k,-l       4  +k,-h,-l       6  +h,+k,-l       8  -k,+h,-l    
+  ISYM  10  -h,+k,+l      12  -k,-h,+l      14  +h,-k,+l      16  +k,+h,+l    
+Warning from LKYOUT: no arguments to LABOUT !
+
+ Maximum and minimum Bragg spacings  1000.000 10000.000 Angstroms
+
+
+ Limits on H,K,L..   0 to   0      0 to   0      0 to   0
+
+
+ WRITTEN OUTPUT MTZ FILE 
+ Logical Name: HKLOUT   Filename: /tmp/hakan/mlfsom_tempfile25956unique.mtz 
+
+ * Title:
+
+ 
+
+ * Base dataset:
+
+        0 HKL_base
+          HKL_base
+          HKL_base
+
+ * Number of Datasets = 0
+
+ * Dataset ID, project/crystal/dataset names, cell dimensions, wavelength:
+
+
+ * Number of Columns = 5
+
+ * Number of Reflections = 0
+
+ * Missing value set to NaN in input mtz file
+
+ * Column Labels :
+
+ H K L F SIGF
+
+ * Column Types :
+
+ H H H F Q
+
+ * Associated datasets :
+
+ 0 0 0 0 0
+
+ * Cell Dimensions : (obsolete - refer to dataset cell dimensions above)
+
+   77.2500   77.2500   38.6600   90.0000   90.0000   90.0000 
+
+ *  Resolution Range :
+
+   Not set - no crystals or reflections? 
+
+ * Sort Order :
+
+      1     2     3     0     0
+
+ * Space group = 'P 43 21 2' (number     96)
+
+
+
+          1 reflections tested
+          0 reflections within resolution limits written to output file
+<B><FONT COLOR="#FF0000"><!--SUMMARY_BEGIN-->
+ UNIQUE:  Normal Termination
+Times: User:       0.1s System:    0.0s Elapsed:     0:00  
+</pre>
+</html>
+<!--SUMMARY_END--></FONT></B>
