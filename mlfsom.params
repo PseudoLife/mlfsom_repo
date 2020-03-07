@@ -2,7 +2,7 @@
 # input/output file parameters
 set mtzfile = pristine.mtz
 set decayedmtz = decayed.mtz
-set decay_halfdose = 45
+set decay_halfdose = 4500000000    # default was 45
 set outprefix    = /home/hakan/Desktop/MLFSOM/myfake
 
 # detector parameters
