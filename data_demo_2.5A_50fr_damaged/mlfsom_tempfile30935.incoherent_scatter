@@ -1,0 +1,14 @@
+STORE
+INPUT
+1-D ASCII
+/tmp/hakan/mlfsom_tempfile30935photons_per_pixel_from_incoherent_scatter.txt
+VERT
+0
+0
+
+1
+2
+EXCHANGE
+SYMM
+1263.37
+1231.4

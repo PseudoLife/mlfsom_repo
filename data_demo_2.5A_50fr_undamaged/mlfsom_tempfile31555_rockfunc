@@ -1,0 +1,25 @@
+s=sqrt(8.0*log(2))
+gauss_rock(x) = norm(x*s)
+lorentz_rock(x) = atan(x*2)/pi
+fwhm=1.76274717126295
+tanh_rock(x) = tanh(x*fwhm)/2
+square_rock(x) = ((x<-0.5)?0:((x>0.5)?1:(x+0.5)))
+sr = 10
+slope=sqrt(4*log(2)/pi)
+area=1.0*(1-1.0/sr)+1.0/sr/slope
+area=1-1.0/sr+1.0/sr/slope
+tophat_rock(x) = ((x<-(0.5-0.5/sr))?gauss_rock((x+0.5-0.5/sr)*sr)/sr/slope:((x>0.5-0.5/sr)?(gauss_rock((x-0.5+0.5/sr)*sr)/sr/slope+(1.-1./sr)):(0.5/sr/slope+(x+(0.5-0.5/sr)))))/(1-1./sr+1./sr/slope)
+disk_rock(x) = (x<=-0.5?0:(x>=0.5?1:(2*x*sqrt(1-4*x**2)+asin(2*x))/pi+0.5))
+rock(x) = disk_rock(x)
+part(start,end)=(\
++1.02174*(rock(start+0./10.*(end-start))-rock(start+1./10.*(end-start)))\
++0.998994*(rock(start+1./10.*(end-start))-rock(start+2./10.*(end-start)))\
++1.00236*(rock(start+2./10.*(end-start))-rock(start+3./10.*(end-start)))\
++0.992815*(rock(start+3./10.*(end-start))-rock(start+4./10.*(end-start)))\
++0.991402*(rock(start+4./10.*(end-start))-rock(start+5./10.*(end-start)))\
++0.986375*(rock(start+5./10.*(end-start))-rock(start+6./10.*(end-start)))\
++1.00282*(rock(start+6./10.*(end-start))-rock(start+7./10.*(end-start)))\
++0.999731*(rock(start+7./10.*(end-start))-rock(start+8./10.*(end-start)))\
++1.00434*(rock(start+8./10.*(end-start))-rock(start+9./10.*(end-start)))\
++1.00651*(rock(start+9./10.*(end-start))-rock(start+10./10.*(end-start)))\
+)

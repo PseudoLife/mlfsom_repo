@@ -1,0 +1,109 @@
+ 
+                      --------------------------------
+                      PROGRAM  FIT2D  Version: V10.132
+                      ________________________________
+ 
+        Copyright 1987-2001 Andy Hammersley / ESRF (hammersley@esrf.fr)
+ 
+FIT2D: 2-D Detector Calibration/Correction; File re-formatting; 2-D Fitting
+ 
+                      YOU CAN ALWAYS ENTER:   ?
+              FOR FURTHER EXPLANATION OF REQUIRED INPUT
+ 
+                    No commercial software used !
+See "CHANGES" (keyboard menu) for important changes
+ 
+ 
+!!! NOTE: "SYMBOLS" commands replaced with "VARIABLES"
+!!! commands in "KEYBOARD" menu
+INFO: The graphics system has been turned off by a command line option
+X DIMENSION FOR ARRAYS (Range: 1 to 1000000) [2463]:2463
+Y DIMENSION FOR ARRAYS (Range: 1 to 1000000) [2463]:2527
+CREATE VARIANCE ARRAYS [NO]:N
+------------------------------------------------------------------------------
+Main menu: ENTER COMMAND [INPUT DATA]:CREAT
+X DATA SIZE (Range: 1 to 2463) [2463]:2463
+Y DATA SIZE (Range: 1 to 2527) [2527]:2527
+Main menu: ENTER COMMAND [GAUSSIAN]:cadd
+ADDITION CONSTANT [1.000000]:10000
+Main menu: ENTER COMMAND [CMULTIPLY]:poisson
+Main menu: ENTER COMMAND [IMAGE]:cadd
+ADDITION CONSTANT [10000.00]:-10000
+Main menu: ENTER COMMAND [CMULTIPLY]:blur
+X BLUR SIZE (Range: 1 to 2463) [2]:50
+Y BLUR SIZE (Range: 1 to 2527) [2]:50
+Main menu: ENTER COMMAND [EXCHANGE]:exchange
+Main menu: ENTER COMMAND [IMAGE]:blur
+X BLUR SIZE (Range: 1 to 2463) [50]:50
+Y BLUR SIZE (Range: 1 to 2527) [50]:50
+Main menu: ENTER COMMAND [EXCHANGE]:exchange
+Main menu: ENTER COMMAND [IMAGE]:blur
+X BLUR SIZE (Range: 1 to 2463) [50]:50
+Y BLUR SIZE (Range: 1 to 2527) [50]:50
+Main menu: ENTER COMMAND [EXCHANGE]:exchange
+Main menu: ENTER COMMAND [IMAGE]:blur
+X BLUR SIZE (Range: 1 to 2463) [50]:50
+Y BLUR SIZE (Range: 1 to 2527) [50]:50
+Main menu: ENTER COMMAND [EXCHANGE]:exchange
+Main menu: ENTER COMMAND [IMAGE]:stat
+INFO: Statistics of Active Data Region (ADR):
+INFO:  Data Coordinate limits: Min (   0.50     ,   0.50    )
+INFO:  Data Coordinate limits: Max (   2.46E+03 ,   2.53E+03)
+INFO:  Pixel number limits: Min (     1 ,     1) Max ( 2463 ,  2527)
+INFO:  Total number of data values =   2463 *   2527 =    6224001
+INFO:  Minimum data value =  -3.9863
+INFO:  Maximum data value =   5.0268
+INFO:  Average (mean) data value = -0.66580E-01
+INFO:  Sum of data values = -0.41439E+06
+INFO:  Root mean square (RMS) value =   1.5440
+INFO:  Standard deviation value =   1.5425
+INFO:  Skewness parameter =  0.14922
+Main menu: ENTER COMMAND [CLOSE LOG]:cdiv
+DIVISION CONSTANT [1.000000]:##SIGMA
+Main menu: ENTER COMMAND [IMAGE]:cmult
+MULTIPLICATION CONSTANT [2.900000]:0.01
+Main menu: ENTER COMMAND [CADD]:cadd
+ADDITION CONSTANT [-10000.00]:1
+Main menu: ENTER COMMAND [CMULTIPLY]:stat
+INFO: Statistics of Active Data Region (ADR):
+INFO:  Data Coordinate limits: Min (   0.50     ,   0.50    )
+INFO:  Data Coordinate limits: Max (   2.46E+03 ,   2.53E+03)
+INFO:  Pixel number limits: Min (     1 ,     1) Max ( 2463 ,  2527)
+INFO:  Total number of data values =   2463 *   2527 =    6224001
+INFO:  Minimum data value =  0.97416
+INFO:  Maximum data value =   1.0326
+INFO:  Average (mean) data value =  0.99957
+INFO:  Sum of data values =  0.62213E+07
+INFO:  Root mean square (RMS) value =  0.99962
+INFO:  Standard deviation value =  0.10000E-01
+INFO:  Skewness parameter =  0.14922
+Main menu: ENTER COMMAND [CLOSE LOG]:output
+FILE FORMAT [FIT2D STANDARD FORMAT]:fit2d
+OUTPUT FILE NAME [fit2d.f2d]:/tmp/hakan/mlfsom_tempfile31555_ripplemask.f2d
+Main menu: ENTER COMMAND [INPUT DATA]:EXIT
+CONFIRM EXIT [NO]:Y
+ 
+                FFFFFF           T         22                      D
+             FFFF               TT        2222                    DD
+          FFFF         I        TT       22  22                   DD
+         FFF          II       TTT TTT  22   222                 DDD
+         FFF     FF   I        TTTTT    2     222                DDD
+        FFFF  FFFF   I      TTTTTT     2       222              DDD
+       FFFFFFFFF    II   TTTTTTTT     2         222          DDDDDD
+   FFFFFFFFF       II   TT    TTT              222         DDD  DDD
+  FF    FFF       III         TTT              22         DD    DDD
+        FFF       II         TTT              22         DD    DDD
+       FFF       II          TTT             22         D     DDD
+       FF        II           TT            22         D     DDD
+      FF        II             TT          2222         DDDDDD
+      F         I                T        22222222222    DDD
+ 
+ 
+ 
+------------------------------------------------------------------------------
+INFO: BYE: FIT2D V10.132 exited by user command
+ 
+INFO: (No commercial software is used within FIT2D.)
+      Spline surface fitting uses FITPACK, written by Paul Dierckx
+------------------------------------------------------------------------------
+ 
