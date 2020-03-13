@@ -1,0 +1,287 @@
+[
+  {
+    "__id__": "DataBlock", 
+    "imageset": [
+      {
+        "__id__": "ImageSweep", 
+        "template": "/Users/atakisi/MLFSOM/distl/single/myfake_###.cbf", 
+        "mask": null, 
+        "gain": null, 
+        "pedestal": null, 
+        "dx": null, 
+        "dy": null, 
+        "beam": 0, 
+        "detector": 0, 
+        "goniometer": 0, 
+        "scan": 0, 
+        "params": {
+          "dynamic_shadowing": "Auto", 
+          "multi_panel": false
+        }
+      }
+    ], 
+    "beam": [
+      {
+        "direction": [
+          0.0, 
+          0.0, 
+          1.0
+        ], 
+        "transmission": 1.0, 
+        "polarization_normal": [
+          0.0, 
+          1.0, 
+          0.0
+        ], 
+        "divergence": 0.0, 
+        "polarization_fraction": 0.999, 
+        "flux": 0.0, 
+        "sigma_divergence": 0.0, 
+        "wavelength": 1.0
+      }
+    ], 
+    "detector": [
+      {
+        "hierarchy": {
+          "origin": [
+            0.0, 
+            0.0, 
+            0.0
+          ], 
+          "fast_axis": [
+            1.0, 
+            0.0, 
+            0.0
+          ], 
+          "name": "", 
+          "raw_image_offset": [
+            0, 
+            0
+          ], 
+          "slow_axis": [
+            0.0, 
+            1.0, 
+            0.0
+          ], 
+          "material": "", 
+          "mask": [], 
+          "thickness": 0.0, 
+          "mu": 0.0, 
+          "gain": 1.0, 
+          "trusted_range": [
+            0.0, 
+            0.0
+          ], 
+          "image_size": [
+            0, 
+            0
+          ], 
+          "px_mm_strategy": {
+            "type": "SimplePxMmStrategy"
+          }, 
+          "pedestal": 0.0, 
+          "identifier": "", 
+          "type": "", 
+          "children": [
+            {
+              "panel": 0
+            }
+          ], 
+          "pixel_size": [
+            0.0, 
+            0.0
+          ]
+        }, 
+        "panels": [
+          {
+            "origin": [
+              -217.29963999999998, 
+              211.8008, 
+              -250.432
+            ], 
+            "fast_axis": [
+              1.0, 
+              0.0, 
+              0.0
+            ], 
+            "name": "Panel", 
+            "raw_image_offset": [
+              0, 
+              0
+            ], 
+            "slow_axis": [
+              0.0, 
+              -1.0, 
+              0.0
+            ], 
+            "material": "Si", 
+            "mask": [
+              [
+                487, 
+                0, 
+                494, 
+                2527
+              ], 
+              [
+                981, 
+                0, 
+                988, 
+                2527
+              ], 
+              [
+                1475, 
+                0, 
+                1482, 
+                2527
+              ], 
+              [
+                1969, 
+                0, 
+                1976, 
+                2527
+              ], 
+              [
+                0, 
+                195, 
+                2463, 
+                212
+              ], 
+              [
+                0, 
+                407, 
+                2463, 
+                424
+              ], 
+              [
+                0, 
+                619, 
+                2463, 
+                636
+              ], 
+              [
+                0, 
+                831, 
+                2463, 
+                848
+              ], 
+              [
+                0, 
+                1043, 
+                2463, 
+                1060
+              ], 
+              [
+                0, 
+                1255, 
+                2463, 
+                1272
+              ], 
+              [
+                0, 
+                1467, 
+                2463, 
+                1484
+              ], 
+              [
+                0, 
+                1679, 
+                2463, 
+                1696
+              ], 
+              [
+                0, 
+                1891, 
+                2463, 
+                1908
+              ], 
+              [
+                0, 
+                2103, 
+                2463, 
+                2120
+              ], 
+              [
+                0, 
+                2315, 
+                2463, 
+                2332
+              ]
+            ], 
+            "thickness": 1.0, 
+            "mu": 4.207981280144381, 
+            "gain": 1.0, 
+            "trusted_range": [
+              -1.0, 
+              1147141.0
+            ], 
+            "image_size": [
+              2463, 
+              2527
+            ], 
+            "px_mm_strategy": {
+              "type": "ParallaxCorrectedPxMmStrategy"
+            }, 
+            "pedestal": 0.0, 
+            "identifier": "", 
+            "type": "SENSOR_PAD", 
+            "pixel_size": [
+              0.17200000000000001, 
+              0.17200000000000001
+            ]
+          }
+        ]
+      }
+    ], 
+    "goniometer": [
+      {
+        "setting_rotation": [
+          1.0, 
+          0.0, 
+          0.0, 
+          0.0, 
+          1.0, 
+          0.0, 
+          0.0, 
+          0.0, 
+          1.0
+        ], 
+        "fixed_rotation": [
+          1.0, 
+          0.0, 
+          0.0, 
+          0.0, 
+          1.0, 
+          0.0, 
+          0.0, 
+          0.0, 
+          1.0
+        ], 
+        "rotation_axis": [
+          -1.0, 
+          0.0, 
+          0.0
+        ]
+      }
+    ], 
+    "scan": [
+      {
+        "exposure_time": [
+          0.5
+        ], 
+        "batch_offset": 0, 
+        "oscillation": [
+          342.0, 
+          1.0
+        ], 
+        "valid_image_ranges": {}, 
+        "epochs": [
+          1582557112.0
+        ], 
+        "image_range": [
+          1, 
+          1
+        ]
+      }
+    ]
+  }
+]

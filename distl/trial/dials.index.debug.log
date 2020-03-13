@@ -1,0 +1,706 @@
+DIALS (2018) Acta Cryst. D74, 85-97. https://doi.org/10.1107/S2059798317017235
+DIALS 1.14.5-g19190e3b9-release
+The following parameters have been modified:
+
+indexing {
+  known_symmetry {
+    space_group = "P 43 21 2"
+    unit_cell = 77 77 38 90 90 90
+  }
+}
+input {
+  datablock = datablock.json
+  reflections = strong.pickle
+}
+
+Target symmetry (reference setting):
+Unit cell: (77, 77, 38, 90, 90, 90)
+
+
+Space group: P 4/m m m (No. 123)
+
+
+Target symmetry (primitive cell):
+Unit cell: (77, 77, 38, 90, 90, 90)
+
+
+Space group: P 4/m m m (No. 123)
+
+
+cb_op reference->primitive: a,b,c
+cb_op primitive->input: a,b,c
+Using max_cell: 100.1 Angstrom
+Setting d_min: 1.96
+FFT gridding: (256,256,256)
+Setting b_iso = 45.8
+Number of centroids used: 49381
+0 78.8140919199 59.0
+1 77.2266649351 50.0
+2 115.800361659 50.0
+3 38.5978197371 46.0
+4 115.742848464 39.0
+5 133.910669731 34.0
+6 87.0507695262 31.0
+7 79.5121738939 28.0
+8 109.434033317 24.0
+9 88.7136211635 20.0
+10 139.688011234 18.0
+11 87.1059651032 15.0
+12 109.533525654 13.0
+13 95.0128454293 12.0
+14 115.779857904 11.0
+15 109.509402102 11.0
+16 109.198300118 11.0
+17 86.7240399316 11.0
+18 139.001551885 10.0
+19 110.98878284 9.0
+20 139.282755138 8.0
+21 57.5527420204 8.0
+22 85.595005845 6.0
+23 159.040167927 5.0
+Candidate basis vectors:
+0 78.8140919199
+1 77.2266649351
+2 115.800361659
+3 38.5978197371
+4 115.742848464
+5 133.910669731
+6 87.0507695262
+7 79.5121738939
+8 109.434033317
+9 88.7136211635
+10 139.688011234
+11 87.1059651032
+12 109.533525654
+13 95.0128454293
+14 109.198300118
+15 109.509402102
+16 86.7240399316
+17 115.779857904
+18 139.001551885
+19 110.98878284
+20 57.5527420204
+21 139.282755138
+22 85.595005845
+23 159.040167927
+Candidate solutions:
+-------------------------------------------------------------------------------------------------------------------------------------------
+unit_cell                        | volume | volume score | #indexed | % indexed | % indexed score | rmsd_xy | rmsd_xy score | overall score
+-------------------------------------------------------------------------------------------------------------------------------------------
+79.10 79.10 38.59 90.0 90.0 90.0 | 241458 | 0.10         | 11304    | 23        | 0.00            | 0.65    | 0.26          | 0.36
+79.10 79.10 39.05 90.0 90.0 90.0 | 244295 | 0.12         | 9162     | 19        | 0.30            | 0.54    | 0.00          | 0.42
+79.10 79.10 38.15 90.0 90.0 90.0 | 238688 | 0.09         | 8973     | 18        | 0.33            | 0.59    | 0.12          | 0.54
+79.64 79.64 39.04 90.0 90.0 90.0 | 247608 | 0.14         | 8861     | 18        | 0.35            | 0.59    | 0.11          | 0.60
+77.21 77.21 38.60 90.0 90.0 90.0 | 230100 | 0.03         | 7259     | 15        | 0.64            | 0.62    | 0.19          | 0.86
+78.36 78.36 39.05 90.0 90.0 90.0 | 239776 | 0.09         | 7128     | 14        | 0.67            | 0.60    | 0.15          | 0.91
+79.10 79.10 38.50 90.0 90.0 90.0 | 240930 | 0.10         | 10907    | 22        | 0.05            | 0.93    | 0.77          | 0.92
+79.12 79.12 38.50 90.0 90.0 90.0 | 241025 | 0.10         | 11052    | 22        | 0.03            | 0.94    | 0.79          | 0.92
+79.10 79.10 38.14 90.0 90.0 90.0 | 238636 | 0.08         | 10291    | 21        | 0.14            | 0.91    | 0.75          | 0.97
+76.95 76.95 38.60 90.0 90.0 90.0 | 228542 | 0.02         | 6517     | 13        | 0.79            | 0.62    | 0.20          | 1.02
+78.63 78.63 38.59 90.0 90.0 90.0 | 238600 | 0.08         | 9071     | 18        | 0.32            | 0.93    | 0.78          | 1.18
+79.49 79.49 38.50 90.0 90.0 90.0 | 243313 | 0.11         | 11233    | 23        | 0.01            | 1.15    | 1.08          | 1.20
+79.21 79.21 38.60 90.0 90.0 90.0 | 242149 | 0.11         | 7836     | 16        | 0.53            | 0.83    | 0.61          | 1.24
+78.78 78.78 38.60 90.0 90.0 90.0 | 239524 | 0.09         | 8714     | 18        | 0.38            | 0.96    | 0.81          | 1.28
+77.52 77.52 38.60 90.0 90.0 90.0 | 231938 | 0.04         | 5035     | 10        | 1.17            | 0.57    | 0.07          | 1.28
+79.11 79.11 38.60 90.0 90.0 90.0 | 241531 | 0.10         | 9399     | 19        | 0.27            | 1.11    | 1.04          | 1.40
+78.45 78.45 38.60 90.0 90.0 90.0 | 237545 | 0.08         | 7679     | 16        | 0.56            | 0.94    | 0.79          | 1.43
+79.42 79.42 38.60 90.0 90.0 90.0 | 243477 | 0.11         | 7805     | 16        | 0.53            | 0.96    | 0.82          | 1.47
+78.43 78.43 38.50 90.0 90.0 90.0 | 236818 | 0.07         | 7231     | 15        | 0.64            | 0.92    | 0.77          | 1.49
+78.24 78.24 38.60 90.0 90.0 90.0 | 236259 | 0.07         | 7675     | 16        | 0.56            | 1.01    | 0.89          | 1.52
+77.46 77.46 39.05 90.0 90.0 90.0 | 234308 | 0.06         | 6153     | 12        | 0.88            | 0.82    | 0.59          | 1.52
+78.87 78.87 38.59 90.0 90.0 90.0 | 240062 | 0.09         | 8996     | 18        | 0.33            | 1.17    | 1.11          | 1.53
+78.11 78.11 39.05 90.0 90.0 90.0 | 238261 | 0.08         | 4652     | 9         | 1.28            | 0.61    | 0.17          | 1.53
+79.32 79.32 38.60 90.0 90.0 90.0 | 242838 | 0.11         | 9194     | 19        | 0.30            | 1.20    | 1.14          | 1.55
+77.78 77.78 38.60 90.0 90.0 90.0 | 233484 | 0.05         | 5436     | 11        | 1.06            | 0.74    | 0.44          | 1.55
+79.78 79.78 38.15 90.0 90.0 90.0 | 242809 | 0.11         | 6753     | 14        | 0.74            | 0.90    | 0.73          | 1.58
+78.36 78.36 38.60 90.0 90.0 90.0 | 237006 | 0.07         | 7285     | 15        | 0.63            | 1.04    | 0.94          | 1.65
+78.97 78.97 38.59 90.0 90.0 90.0 | 240690 | 0.10         | 8503     | 17        | 0.41            | 1.24    | 1.19          | 1.70
+79.21 79.21 38.60 90.0 90.0 90.0 | 242181 | 0.11         | 9088     | 18        | 0.31            | 1.33    | 1.29          | 1.71
+78.10 78.10 38.60 90.0 90.0 90.0 | 235423 | 0.07         | 6643     | 13        | 0.77            | 1.02    | 0.91          | 1.74
+79.18 79.18 38.59 90.0 90.0 90.0 | 241985 | 0.10         | 8823     | 18        | 0.36            | 1.33    | 1.29          | 1.75
+78.71 78.71 38.60 90.0 90.0 90.0 | 239103 | 0.09         | 7445     | 15        | 0.60            | 1.15    | 1.08          | 1.77
+77.63 77.63 38.60 90.0 90.0 90.0 | 232634 | 0.05         | 5678     | 11        | 0.99            | 0.93    | 0.78          | 1.82
+78.36 78.36 38.60 90.0 90.0 90.0 | 236992 | 0.07         | 6372     | 13        | 0.83            | 1.05    | 0.96          | 1.86
+78.52 78.52 38.60 90.0 90.0 90.0 | 237960 | 0.08         | 6465     | 13        | 0.81            | 1.13    | 1.05          | 1.94
+78.15 78.15 38.60 90.0 90.0 90.0 | 235718 | 0.07         | 6129     | 12        | 0.88            | 1.10    | 1.02          | 1.97
+78.56 78.56 38.60 90.0 90.0 90.0 | 238202 | 0.08         | 7009     | 14        | 0.69            | 1.28    | 1.23          | 2.01
+78.02 78.02 38.59 90.0 90.0 90.0 | 234946 | 0.06         | 6273     | 13        | 0.85            | 1.20    | 1.14          | 2.05
+79.51 79.51 38.60 90.0 90.0 90.0 | 244027 | 0.12         | 8901     | 18        | 0.34            | 1.65    | 1.60          | 2.06
+79.93 79.93 38.60 90.0 90.0 90.0 | 246605 | 0.13         | 9813     | 20        | 0.20            | 1.86    | 1.78          | 2.11
+78.74 78.74 38.60 90.0 90.0 90.0 | 239272 | 0.09         | 6546     | 13        | 0.79            | 1.30    | 1.26          | 2.13
+77.57 77.57 38.60 90.0 90.0 90.0 | 232219 | 0.05         | 4067     | 8         | 1.47            | 0.86    | 0.67          | 2.19
+80.24 80.24 38.60 90.0 90.0 90.0 | 248488 | 0.14         | 9717     | 20        | 0.22            | 2.02    | 1.90          | 2.26
+79.13 79.13 38.60 90.0 90.0 90.0 | 241659 | 0.10         | 6492     | 13        | 0.80            | 1.89    | 1.80          | 2.70
+76.93 76.93 38.03 90.0 90.0 90.0 | 225029 | 0.00         | 7270     | 15        | 0.64            | 2.45    | 2.17          | 2.81
+78.45 78.45 38.60 90.0 90.0 90.0 | 237561 | 0.08         | 5329     | 11        | 1.08            | 1.78    | 1.71          | 2.87
+78.33 78.33 38.59 90.0 90.0 90.0 | 236776 | 0.07         | 6251     | 13        | 0.85            | 2.14    | 1.98          | 2.91
+79.01 79.01 38.62 90.0 90.0 90.0 | 241089 | 0.10         | 6451     | 13        | 0.81            | 2.54    | 2.23          | 3.13
+79.84 79.84 38.60 90.0 90.0 90.0 | 246038 | 0.13         | 6159     | 12        | 0.88            | 2.57    | 2.24          | 3.25
+77.88 77.88 38.60 90.0 90.0 90.0 | 234091 | 0.06         | 3703     | 7         | 1.61            | 1.87    | 1.78          | 3.45
+-------------------------------------------------------------------------------------------------------------------------------------------
+best model_likelihood: 0.35
+best n_indexed: 11304
+Using d_min_step 0.0
+
+Indexed crystal models:
+model 1 (7832 reflections):
+Crystal:
+    Unit cell: (79.103, 79.103, 38.589, 90.000, 90.000, 90.000)
+    Space group: P 43 21 2
+    U matrix:  {{-0.0127, -0.0142,  0.9998},
+                {-0.9999,  0.0049, -0.0126},
+                {-0.0047, -0.9999, -0.0142}}
+    B matrix:  {{ 0.0126,  0.0000,  0.0000},
+                {-0.0000,  0.0126,  0.0000},
+                {-0.0000, -0.0000,  0.0259}}
+    A = UB:    {{-0.0002, -0.0002,  0.0259},
+                {-0.0126,  0.0001, -0.0003},
+                {-0.0001, -0.0126, -0.0004}}
+
+------------------------------------
+| Imageset | #indexed | #unindexed |
+------------------------------------
+| 0        | 7832     | 41553      |
+------------------------------------
+
+################################################################################
+Starting refinement (macro-cycle 1)
+################################################################################
+
+
+Building reflection manager
+Input reflection list size = 7832 observations
+Random seed set to 42
+Number of observations that pass initial inclusion criteria = 7820
+Working set size = 7820 observations
+Reflection manager built
+
+Finalising the Reflection Manager
+Detecting centroid outliers using the Tukey algorithm
+702 reflections have been flagged as outliers
+Outlier rejections per job:
+------------------------------------------------------------
+| Job | Exp | Panel | Block range     | Nref | Nout | %out |
+|     | id  | id    | (deg)           |      |      |      |
+------------------------------------------------------------
+| 1   | 0   | 0     | 342.50 - 359.00 | 1106 | 191  | 17.3 |
+| 2   | 0   | 0     | 359.00 - 375.50 | 1199 | 89   | 7.4  |
+| 3   | 0   | 0     | 375.50 - 392.00 | 833  | 17   | 2.0  |
+| 4   | 0   | 0     | 392.00 - 408.50 | 2331 | 238  | 10.2 |
+| 5   | 0   | 0     | 408.50 - 425.00 | 792  | 80   | 10.1 |
+| 6   | 0   | 0     | 425.00 - 441.50 | 1559 | 87   | 5.6  |
+------------------------------------------------------------
+Removing reflections not matched to predictions or marked as outliers
+7118 reflections remain in the manager
+Working set size = 7118 observations
+Building prediction equation parameterisation
+Prediction equation parameterisation built
+Parameter order : name mapping
+Parameter 001 : Detector1Dist
+Parameter 002 : Detector1Shift1
+Parameter 003 : Detector1Shift2
+Parameter 004 : Detector1Tau1
+Parameter 005 : Detector1Tau2
+Parameter 006 : Detector1Tau3
+Parameter 007 : Beam1Mu2
+Parameter 008 : Crystal1Phi1
+Parameter 009 : Crystal1Phi2
+Parameter 010 : Crystal1Phi3
+Parameter 011 : Crystal1g_param_0
+Parameter 012 : Crystal1g_param_1
+Building target function
+Target function built
+Building refinement engine
+Selected refinement engine type: LevMar
+Refinement engine built
+Step 0
+Step 1
+Step 2
+Step 3
+Step 4
+Step 5
+Step 6
+Step 7
+Step 8
+Step 9
+Step 10
+Step 11
+
+Refinement steps:
+----------------------------------------------
+| Step | Nref | RMSD_X  | RMSD_Y  | RMSD_Phi |
+|      |      | (mm)    | (mm)    | (deg)    |
+----------------------------------------------
+| 0    | 7118 | 0.84069 | 0.47768 | 0.38453  |
+| 1    | 7118 | 0.47804 | 0.45585 | 0.39611  |
+| 2    | 7118 | 0.40215 | 0.43519 | 0.43153  |
+| 3    | 7118 | 0.30352 | 0.42196 | 0.46404  |
+| 4    | 7118 | 0.22544 | 0.41097 | 0.45457  |
+| 5    | 7118 | 0.18167 | 0.39645 | 0.50684  |
+| 6    | 7118 | 0.15882 | 0.38842 | 0.58342  |
+| 7    | 7118 | 0.14882 | 0.38628 | 0.6277   |
+| 8    | 7118 | 0.14675 | 0.38607 | 0.64187  |
+| 9    | 7118 | 0.14656 | 0.38605 | 0.64358  |
+| 10   | 7118 | 0.14655 | 0.38605 | 0.64365  |
+| 11   | 7118 | 0.14655 | 0.38605 | 0.64365  |
+----------------------------------------------
+RMSD no longer decreasing
+
+RMSDs by experiment:
+--------------------------------------------
+| Exp | Nref | RMSD_X  | RMSD_Y | RMSD_Z   |
+| id  |      | (px)    | (px)   | (images) |
+--------------------------------------------
+| 0   | 7118 | 0.85203 | 2.2445 | 0.64365  |
+--------------------------------------------
+
+Refined crystal models:
+model 1 (7583 reflections):
+Crystal:
+    Unit cell: (76.57(4), 76.57(4), 37.51(2), 90.0, 90.0, 90.0)
+    Space group: P 43 21 2
+    U matrix:  {{-0.0038, -0.0000,  1.0000},
+                {-1.0000,  0.0067, -0.0038},
+                {-0.0067, -1.0000, -0.0001}}
+    B matrix:  {{ 0.0131,  0.0000,  0.0000},
+                { 0.0000,  0.0131,  0.0000},
+                { 0.0000,  0.0000,  0.0267}}
+    A = UB:    {{-0.0000, -0.0000,  0.0267},
+                {-0.0131,  0.0001, -0.0001},
+                {-0.0001, -0.0131, -0.0000}}
+
+------------------------------------
+| Imageset | #indexed | #unindexed |
+------------------------------------
+| 0        | 7583     | 40037      |
+------------------------------------
+Increasing resolution to 1.94 Angstrom
+
+################################################################################
+Starting refinement (macro-cycle 2)
+################################################################################
+
+
+Building reflection manager
+Input reflection list size = 17607 observations
+Random seed set to 42
+Number of observations that pass initial inclusion criteria = 17591
+Working set size = 17591 observations
+Reflection manager built
+
+Finalising the Reflection Manager
+Detecting centroid outliers using the Tukey algorithm
+864 reflections have been flagged as outliers
+Outlier rejections per job:
+------------------------------------------------------------
+| Job | Exp | Panel | Block range     | Nref | Nout | %out |
+|     | id  | id    | (deg)           |      |      |      |
+------------------------------------------------------------
+| 1   | 0   | 0     | 342.50 - 359.00 | 4160 | 69   | 1.7  |
+| 2   | 0   | 0     | 359.00 - 375.50 | 3662 | 134  | 3.7  |
+| 3   | 0   | 0     | 375.50 - 392.00 | 1985 | 95   | 4.8  |
+| 4   | 0   | 0     | 392.00 - 408.50 | 3154 | 326  | 10.3 |
+| 5   | 0   | 0     | 408.50 - 425.00 | 1493 | 85   | 5.7  |
+| 6   | 0   | 0     | 425.00 - 441.50 | 3137 | 155  | 4.9  |
+------------------------------------------------------------
+Removing reflections not matched to predictions or marked as outliers
+16727 reflections remain in the manager
+Working set size = 9999 observations
+Building prediction equation parameterisation
+Prediction equation parameterisation built
+Parameter order : name mapping
+Parameter 001 : Detector1Dist
+Parameter 002 : Detector1Shift1
+Parameter 003 : Detector1Shift2
+Parameter 004 : Detector1Tau1
+Parameter 005 : Detector1Tau2
+Parameter 006 : Detector1Tau3
+Parameter 007 : Beam1Mu2
+Parameter 008 : Crystal1Phi1
+Parameter 009 : Crystal1Phi2
+Parameter 010 : Crystal1Phi3
+Parameter 011 : Crystal1g_param_0
+Parameter 012 : Crystal1g_param_1
+Building target function
+Target function built
+Building refinement engine
+Selected refinement engine type: LevMar
+Refinement engine built
+Step 0
+Step 1
+Step 2
+Step 3
+Step 4
+Step 5
+Step 6
+Step 7
+Step 8
+
+Refinement steps:
+----------------------------------------------
+| Step | Nref | RMSD_X  | RMSD_Y  | RMSD_Phi |
+|      |      | (mm)    | (mm)    | (deg)    |
+----------------------------------------------
+| 0    | 9999 | 0.26164 | 0.49138 | 0.42028  |
+| 1    | 9999 | 0.2014  | 0.48146 | 0.42028  |
+| 2    | 9999 | 0.18088 | 0.4741  | 0.42078  |
+| 3    | 9999 | 0.16099 | 0.46164 | 0.43374  |
+| 4    | 9999 | 0.1558  | 0.45055 | 0.47167  |
+| 5    | 9999 | 0.15945 | 0.44591 | 0.49935  |
+| 6    | 9999 | 0.16097 | 0.44497 | 0.50594  |
+| 7    | 9999 | 0.16115 | 0.44488 | 0.50657  |
+| 8    | 9999 | 0.16116 | 0.44488 | 0.50659  |
+----------------------------------------------
+RMSD no longer decreasing
+
+RMSDs by experiment:
+--------------------------------------------
+| Exp | Nref | RMSD_X  | RMSD_Y | RMSD_Z   |
+| id  |      | (px)    | (px)   | (images) |
+--------------------------------------------
+| 0   | 9999 | 0.93696 | 2.5865 | 0.50659  |
+--------------------------------------------
+
+Refined crystal models:
+model 1 (17212 reflections):
+Crystal:
+    Unit cell: (75.17(3), 75.17(3), 36.911(15), 90.0, 90.0, 90.0)
+    Space group: P 43 21 2
+    U matrix:  {{ 0.0004, -0.0005,  1.0000},
+                {-1.0000,  0.0071,  0.0004},
+                {-0.0071, -1.0000, -0.0005}}
+    B matrix:  {{ 0.0133,  0.0000,  0.0000},
+                { 0.0000,  0.0133,  0.0000},
+                { 0.0000,  0.0000,  0.0271}}
+    A = UB:    {{ 0.0000, -0.0000,  0.0271},
+                {-0.0133,  0.0001,  0.0000},
+                {-0.0001, -0.0133, -0.0000}}
+
+------------------------------------
+| Imageset | #indexed | #unindexed |
+------------------------------------
+| 0        | 17212    | 29549      |
+------------------------------------
+Increasing resolution to 1.93 Angstrom
+
+################################################################################
+Starting refinement (macro-cycle 3)
+################################################################################
+
+
+Building reflection manager
+Input reflection list size = 17991 observations
+Random seed set to 42
+Number of observations that pass initial inclusion criteria = 17974
+Working set size = 17974 observations
+Reflection manager built
+
+Finalising the Reflection Manager
+Detecting centroid outliers using the Tukey algorithm
+940 reflections have been flagged as outliers
+Outlier rejections per job:
+------------------------------------------------------------
+| Job | Exp | Panel | Block range     | Nref | Nout | %out |
+|     | id  | id    | (deg)           |      |      |      |
+------------------------------------------------------------
+| 1   | 0   | 0     | 342.50 - 359.00 | 3768 | 178  | 4.7  |
+| 2   | 0   | 0     | 359.00 - 375.50 | 4022 | 169  | 4.2  |
+| 3   | 0   | 0     | 375.50 - 392.00 | 2615 | 203  | 7.8  |
+| 4   | 0   | 0     | 392.00 - 408.50 | 2914 | 201  | 6.9  |
+| 5   | 0   | 0     | 408.50 - 425.00 | 2013 | 111  | 5.5  |
+| 6   | 0   | 0     | 425.00 - 441.50 | 2642 | 78   | 3.0  |
+------------------------------------------------------------
+Removing reflections not matched to predictions or marked as outliers
+17034 reflections remain in the manager
+Working set size = 9999 observations
+Building prediction equation parameterisation
+Prediction equation parameterisation built
+Parameter order : name mapping
+Parameter 001 : Detector1Dist
+Parameter 002 : Detector1Shift1
+Parameter 003 : Detector1Shift2
+Parameter 004 : Detector1Tau1
+Parameter 005 : Detector1Tau2
+Parameter 006 : Detector1Tau3
+Parameter 007 : Beam1Mu2
+Parameter 008 : Crystal1Phi1
+Parameter 009 : Crystal1Phi2
+Parameter 010 : Crystal1Phi3
+Parameter 011 : Crystal1g_param_0
+Parameter 012 : Crystal1g_param_1
+Building target function
+Target function built
+Building refinement engine
+Selected refinement engine type: LevMar
+Refinement engine built
+Step 0
+Step 1
+Step 2
+Step 3
+Step 4
+Step 5
+Step 6
+Step 7
+Step 8
+
+Refinement steps:
+----------------------------------------------
+| Step | Nref | RMSD_X  | RMSD_Y  | RMSD_Phi |
+|      |      | (mm)    | (mm)    | (deg)    |
+----------------------------------------------
+| 0    | 9999 | 0.15655 | 0.47186 | 0.42684  |
+| 1    | 9999 | 0.15711 | 0.4705  | 0.42693  |
+| 2    | 9999 | 0.16017 | 0.4679  | 0.42782  |
+| 3    | 9999 | 0.16685 | 0.46357 | 0.43148  |
+| 4    | 9999 | 0.17477 | 0.45951 | 0.43795  |
+| 5    | 9999 | 0.17864 | 0.45774 | 0.44201  |
+| 6    | 9999 | 0.17937 | 0.45742 | 0.44289  |
+| 7    | 9999 | 0.17943 | 0.4574  | 0.44296  |
+| 8    | 9999 | 0.17943 | 0.4574  | 0.44296  |
+----------------------------------------------
+RMSD no longer decreasing
+
+RMSDs by experiment:
+-------------------------------------------
+| Exp | Nref | RMSD_X | RMSD_Y | RMSD_Z   |
+| id  |      | (px)   | (px)   | (images) |
+-------------------------------------------
+| 0   | 9999 | 1.0432 | 2.6593 | 0.44296  |
+-------------------------------------------
+
+Refined crystal models:
+model 1 (17855 reflections):
+Crystal:
+    Unit cell: (74.65(3), 74.65(3), 36.673(15), 90.0, 90.0, 90.0)
+    Space group: P 43 21 2
+    U matrix:  {{ 0.0008, -0.0008,  1.0000},
+                {-1.0000,  0.0070,  0.0008},
+                {-0.0070, -1.0000, -0.0008}}
+    B matrix:  {{ 0.0134,  0.0000,  0.0000},
+                { 0.0000,  0.0134,  0.0000},
+                { 0.0000,  0.0000,  0.0273}}
+    A = UB:    {{ 0.0000, -0.0000,  0.0273},
+                {-0.0134,  0.0001,  0.0000},
+                {-0.0001, -0.0134, -0.0000}}
+
+------------------------------------
+| Imageset | #indexed | #unindexed |
+------------------------------------
+| 0        | 17855    | 28836      |
+------------------------------------
+Increasing resolution to 1.92 Angstrom
+
+################################################################################
+Starting refinement (macro-cycle 4)
+################################################################################
+
+
+Building reflection manager
+Input reflection list size = 17971 observations
+Random seed set to 42
+Number of observations that pass initial inclusion criteria = 17955
+Working set size = 17955 observations
+Reflection manager built
+
+Finalising the Reflection Manager
+Detecting centroid outliers using the Tukey algorithm
+1046 reflections have been flagged as outliers
+Outlier rejections per job:
+------------------------------------------------------------
+| Job | Exp | Panel | Block range     | Nref | Nout | %out |
+|     | id  | id    | (deg)           |      |      |      |
+------------------------------------------------------------
+| 1   | 0   | 0     | 342.50 - 359.00 | 3555 | 169  | 4.8  |
+| 2   | 0   | 0     | 359.00 - 375.50 | 4118 | 194  | 4.7  |
+| 3   | 0   | 0     | 375.50 - 392.00 | 2767 | 272  | 9.8  |
+| 4   | 0   | 0     | 392.00 - 408.50 | 2799 | 206  | 7.4  |
+| 5   | 0   | 0     | 408.50 - 425.00 | 2276 | 131  | 5.8  |
+| 6   | 0   | 0     | 425.00 - 441.50 | 2440 | 74   | 3.0  |
+------------------------------------------------------------
+Removing reflections not matched to predictions or marked as outliers
+16909 reflections remain in the manager
+Working set size = 9999 observations
+Building prediction equation parameterisation
+Prediction equation parameterisation built
+Parameter order : name mapping
+Parameter 001 : Detector1Dist
+Parameter 002 : Detector1Shift1
+Parameter 003 : Detector1Shift2
+Parameter 004 : Detector1Tau1
+Parameter 005 : Detector1Tau2
+Parameter 006 : Detector1Tau3
+Parameter 007 : Beam1Mu2
+Parameter 008 : Crystal1Phi1
+Parameter 009 : Crystal1Phi2
+Parameter 010 : Crystal1Phi3
+Parameter 011 : Crystal1g_param_0
+Parameter 012 : Crystal1g_param_1
+Building target function
+Target function built
+Building refinement engine
+Selected refinement engine type: LevMar
+Refinement engine built
+Step 0
+Step 1
+Step 2
+Step 3
+Step 4
+Step 5
+Step 6
+Step 7
+Step 8
+
+Refinement steps:
+----------------------------------------------
+| Step | Nref | RMSD_X  | RMSD_Y  | RMSD_Phi |
+|      |      | (mm)    | (mm)    | (deg)    |
+----------------------------------------------
+| 0    | 9999 | 0.17669 | 0.46966 | 0.42852  |
+| 1    | 9999 | 0.17717 | 0.46908 | 0.42861  |
+| 2    | 9999 | 0.17934 | 0.46783 | 0.42901  |
+| 3    | 9999 | 0.18346 | 0.46564 | 0.4302   |
+| 4    | 9999 | 0.18783 | 0.4635  | 0.43233  |
+| 5    | 9999 | 0.18986 | 0.46255 | 0.43399  |
+| 6    | 9999 | 0.19022 | 0.46238 | 0.4345   |
+| 7    | 9999 | 0.19025 | 0.46237 | 0.43456  |
+| 8    | 9999 | 0.19025 | 0.46237 | 0.43456  |
+----------------------------------------------
+RMSD no longer decreasing
+
+RMSDs by experiment:
+-------------------------------------------
+| Exp | Nref | RMSD_X | RMSD_Y | RMSD_Z   |
+| id  |      | (px)   | (px)   | (images) |
+-------------------------------------------
+| 0   | 9999 | 1.1061 | 2.6882 | 0.43456  |
+-------------------------------------------
+
+Refined crystal models:
+model 1 (17907 reflections):
+Crystal:
+    Unit cell: (74.42(3), 74.42(3), 36.559(15), 90.0, 90.0, 90.0)
+    Space group: P 43 21 2
+    U matrix:  {{ 0.0008, -0.0010,  1.0000},
+                {-1.0000,  0.0070,  0.0008},
+                {-0.0070, -1.0000, -0.0010}}
+    B matrix:  {{ 0.0134,  0.0000,  0.0000},
+                { 0.0000,  0.0134,  0.0000},
+                { 0.0000,  0.0000,  0.0274}}
+    A = UB:    {{ 0.0000, -0.0000,  0.0274},
+                {-0.0134,  0.0001,  0.0000},
+                {-0.0001, -0.0134, -0.0000}}
+
+------------------------------------
+| Imageset | #indexed | #unindexed |
+------------------------------------
+| 0        | 17907    | 28963      |
+------------------------------------
+Increasing resolution to 1.91 Angstrom
+
+################################################################################
+Starting refinement (macro-cycle 5)
+################################################################################
+
+
+Building reflection manager
+Input reflection list size = 17979 observations
+Random seed set to 42
+Number of observations that pass initial inclusion criteria = 17962
+Working set size = 17962 observations
+Reflection manager built
+
+Finalising the Reflection Manager
+Detecting centroid outliers using the Tukey algorithm
+1192 reflections have been flagged as outliers
+Outlier rejections per job:
+------------------------------------------------------------
+| Job | Exp | Panel | Block range     | Nref | Nout | %out |
+|     | id  | id    | (deg)           |      |      |      |
+------------------------------------------------------------
+| 1   | 0   | 0     | 342.50 - 359.00 | 3462 | 208  | 6.0  |
+| 2   | 0   | 0     | 359.00 - 375.50 | 4153 | 205  | 4.9  |
+| 3   | 0   | 0     | 375.50 - 392.00 | 2886 | 313  | 10.8 |
+| 4   | 0   | 0     | 392.00 - 408.50 | 2729 | 230  | 8.4  |
+| 5   | 0   | 0     | 408.50 - 425.00 | 2399 | 153  | 6.4  |
+| 6   | 0   | 0     | 425.00 - 441.50 | 2333 | 83   | 3.6  |
+------------------------------------------------------------
+Removing reflections not matched to predictions or marked as outliers
+16770 reflections remain in the manager
+Working set size = 9999 observations
+Building prediction equation parameterisation
+Prediction equation parameterisation built
+Parameter order : name mapping
+Parameter 001 : Detector1Dist
+Parameter 002 : Detector1Shift1
+Parameter 003 : Detector1Shift2
+Parameter 004 : Detector1Tau1
+Parameter 005 : Detector1Tau2
+Parameter 006 : Detector1Tau3
+Parameter 007 : Beam1Mu2
+Parameter 008 : Crystal1Phi1
+Parameter 009 : Crystal1Phi2
+Parameter 010 : Crystal1Phi3
+Parameter 011 : Crystal1g_param_0
+Parameter 012 : Crystal1g_param_1
+Building target function
+Target function built
+Building refinement engine
+Selected refinement engine type: LevMar
+Refinement engine built
+Step 0
+Step 1
+Step 2
+Step 3
+Step 4
+Step 5
+Step 6
+Step 7
+Step 8
+
+Refinement steps:
+----------------------------------------------
+| Step | Nref | RMSD_X  | RMSD_Y  | RMSD_Phi |
+|      |      | (mm)    | (mm)    | (deg)    |
+----------------------------------------------
+| 0    | 9999 | 0.18985 | 0.4685  | 0.42745  |
+| 1    | 9999 | 0.19002 | 0.46817 | 0.42762  |
+| 2    | 9999 | 0.19116 | 0.46748 | 0.42803  |
+| 3    | 9999 | 0.19342 | 0.46623 | 0.42901  |
+| 4    | 9999 | 0.19576 | 0.46497 | 0.43068  |
+| 5    | 9999 | 0.19677 | 0.46442 | 0.43219  |
+| 6    | 9999 | 0.19691 | 0.46433 | 0.4328   |
+| 7    | 9999 | 0.19691 | 0.46433 | 0.4329   |
+| 8    | 9999 | 0.19691 | 0.46433 | 0.4329   |
+----------------------------------------------
+RMSD no longer decreasing
+
+RMSDs by experiment:
+-------------------------------------------
+| Exp | Nref | RMSD_X | RMSD_Y | RMSD_Z   |
+| id  |      | (px)   | (px)   | (images) |
+-------------------------------------------
+| 0   | 9999 | 1.1448 | 2.6996 | 0.4329   |
+-------------------------------------------
+
+Refined crystal models:
+model 1 (17923 reflections):
+Crystal:
+    Unit cell: (74.25(3), 74.25(3), 36.480(15), 90.0, 90.0, 90.0)
+    Space group: P 43 21 2
+    U matrix:  {{ 0.0002, -0.0007,  1.0000},
+                {-1.0000,  0.0070,  0.0002},
+                {-0.0070, -1.0000, -0.0007}}
+    B matrix:  {{ 0.0135,  0.0000,  0.0000},
+                { 0.0000,  0.0135,  0.0000},
+                { 0.0000,  0.0000,  0.0274}}
+    A = UB:    {{ 0.0000, -0.0000,  0.0274},
+                {-0.0135,  0.0001,  0.0000},
+                {-0.0001, -0.0135, -0.0000}}
+
+------------------------------------
+| Imageset | #indexed | #unindexed |
+------------------------------------
+| 0        | 17923    | 29166      |
+------------------------------------
+Saving refined experiments to experiments.json
+Saving refined reflections to indexed.pickle

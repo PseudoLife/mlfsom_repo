@@ -7,8 +7,8 @@ input {
 }
 
 --------------------------------------------------------------------------------
-  format: <class 'dxtbx.format.FormatCBFMiniPilatusCHESS_6MSN127.FormatCBFMiniPilatusCHESS_6MSN127'>
-  num images: 1
+  format: <class 'dxtbx.format.FormatSMVADSCDBG.FormatSMVADSCDBG'>
+  num images: 100
   num sweeps: 1
   num stills: 0
 --------------------------------------------------------------------------------

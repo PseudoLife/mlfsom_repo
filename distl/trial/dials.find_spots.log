@@ -2,34 +2,149 @@ DIALS (2018) Acta Cryst. D74, 85-97. https://doi.org/10.1107/S2059798317017235
 DIALS 1.14.5-g19190e3b9-release
 The following parameters have been modified:
 
+spotfinder {
+  mp {
+    nproc = 4
+  }
+}
 input {
   datablock = datablock.json
 }
 
-Setting spotfinder.filter.min_spot_size=3
+Setting spotfinder.filter.min_spot_size=6
 Configuring spot finder from input parameters
 --------------------------------------------------------------------------------
 Finding strong spots in imageset 0
 --------------------------------------------------------------------------------
 
 
-Finding spots in image 1 to 1...
-Setting chunksize=1
+Finding spots in image 1 to 100...
+Setting chunksize=25
 Extracting strong pixels from images
- Using multiprocessing with 1 parallel job(s)
+ Using multiprocessing with 4 parallel job(s)
 
-Found 5440 strong pixels on image 1
+Found 6713 strong pixels on image 1
+Found 6740 strong pixels on image 2
+Found 6439 strong pixels on image 3
+Found 6181 strong pixels on image 4
+Found 6986 strong pixels on image 5
+Found 6517 strong pixels on image 6
+Found 6275 strong pixels on image 7
+Found 6496 strong pixels on image 8
+Found 6440 strong pixels on image 9
+Found 6491 strong pixels on image 10
+Found 6488 strong pixels on image 11
+Found 6270 strong pixels on image 12
+Found 6329 strong pixels on image 13
+Found 6866 strong pixels on image 14
+Found 6897 strong pixels on image 15
+Found 6531 strong pixels on image 16
+Found 6284 strong pixels on image 17
+Found 6079 strong pixels on image 18
+Found 6248 strong pixels on image 19
+Found 6335 strong pixels on image 20
+Found 6465 strong pixels on image 21
+Found 6914 strong pixels on image 22
+Found 6840 strong pixels on image 23
+Found 6511 strong pixels on image 24
+Found 6352 strong pixels on image 25
+Found 6502 strong pixels on image 26
+Found 6414 strong pixels on image 27
+Found 6544 strong pixels on image 28
+Found 6580 strong pixels on image 29
+Found 6203 strong pixels on image 30
+Found 6681 strong pixels on image 31
+Found 6929 strong pixels on image 32
+Found 6383 strong pixels on image 33
+Found 6380 strong pixels on image 34
+Found 6660 strong pixels on image 35
+Found 6667 strong pixels on image 36
+Found 6470 strong pixels on image 37
+Found 6483 strong pixels on image 38
+Found 6577 strong pixels on image 39
+Found 7135 strong pixels on image 40
+Found 6412 strong pixels on image 41
+Found 6899 strong pixels on image 42
+Found 6450 strong pixels on image 43
+Found 6560 strong pixels on image 44
+Found 6901 strong pixels on image 45
+Found 6283 strong pixels on image 46
+Found 7004 strong pixels on image 47
+Found 6646 strong pixels on image 48
+Found 6961 strong pixels on image 49
+Found 6376 strong pixels on image 50
+Found 6938 strong pixels on image 51
+Found 6777 strong pixels on image 52
+Found 6905 strong pixels on image 53
+Found 7342 strong pixels on image 54
+Found 7008 strong pixels on image 55
+Found 6839 strong pixels on image 56
+Found 7454 strong pixels on image 57
+Found 7305 strong pixels on image 58
+Found 7394 strong pixels on image 59
+Found 7212 strong pixels on image 60
+Found 7136 strong pixels on image 61
+Found 7405 strong pixels on image 62
+Found 6935 strong pixels on image 63
+Found 6986 strong pixels on image 64
+Found 7254 strong pixels on image 65
+Found 7220 strong pixels on image 66
+Found 7304 strong pixels on image 67
+Found 7724 strong pixels on image 68
+Found 7529 strong pixels on image 69
+Found 7640 strong pixels on image 70
+Found 7278 strong pixels on image 71
+Found 7409 strong pixels on image 72
+Found 7916 strong pixels on image 73
+Found 7235 strong pixels on image 74
+Found 7295 strong pixels on image 75
+Found 7725 strong pixels on image 76
+Found 7120 strong pixels on image 77
+Found 7828 strong pixels on image 78
+Found 7457 strong pixels on image 79
+Found 7877 strong pixels on image 80
+Found 7227 strong pixels on image 81
+Found 7961 strong pixels on image 82
+Found 7559 strong pixels on image 83
+Found 7521 strong pixels on image 84
+Found 8071 strong pixels on image 85
+Found 7585 strong pixels on image 86
+Found 8409 strong pixels on image 87
+Found 7802 strong pixels on image 88
+Found 7697 strong pixels on image 89
+Found 7550 strong pixels on image 90
+Found 7877 strong pixels on image 91
+Found 8077 strong pixels on image 92
+Found 7637 strong pixels on image 93
+Found 7444 strong pixels on image 94
+Found 8300 strong pixels on image 95
+Found 7825 strong pixels on image 96
+Found 7600 strong pixels on image 97
+Found 7956 strong pixels on image 98
+Found 7909 strong pixels on image 99
+Found 8009 strong pixels on image 100
 
-Extracted 1603 spots
-Removed 1209 spots with size < 3 pixels
-Removed 1 spots with size > 100 pixels
-Calculated 393 spot centroids
-Calculated 393 spot intensities
-Filtered 393 of 393 spots by peak-centroid distance
+Extracted 58520 spots
+Removed 8480 spots with size < 6 pixels
+Removed 5 spots with size > 100 pixels
+Calculated 50035 spot centroids
+Calculated 50035 spot intensities
+Filtered 49958 of 50035 spots by peak-centroid distance
 
 Histogram of per-image spot count for imageset 0:
-393 spots found on 1 image
+49958 spots found on 100 images (max 1106 / bin)
+                                                           *
+*       *                *  *  *   *  *  *   *  *  *   *  **
+**   *  *  *   *  *  *   *  *  *   *  *  *   *  *  *   *  **
+*** ** *** *****  * ** *************************************
+************************************************************
+************************************************************
+************************************************************
+************************************************************
+************************************************************
+************************************************************
+1                         image                          100
 
 --------------------------------------------------------------------------------
-Saved 393 reflections to strong.pickle
-Time Taken: 1.120681
+Saved 49958 reflections to strong.pickle
+Time Taken: 23.386657

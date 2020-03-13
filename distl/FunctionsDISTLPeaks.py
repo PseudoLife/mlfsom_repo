@@ -51,7 +51,7 @@ def ReadDISTLPeakIntensities(image_folder,header_contents,distl_params):
 			print "WARNING: Frame %i is corrupted, will be skipped..." %fnumber
 		else:			
 			# convert img to cbf
-			img2cbf(fake_img,header_contents,keep_original=True)
+			img2cbf(fake_img,keep_original=True)
 			fake_cbf = fake_img[0:-3]+'cbf'
 
 			# run DISTL to find peaks using custom params in distl_params file

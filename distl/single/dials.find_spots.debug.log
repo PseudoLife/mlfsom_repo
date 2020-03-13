@@ -1,0 +1,36 @@
+DIALS (2018) Acta Cryst. D74, 85-97. https://doi.org/10.1107/S2059798317017235
+DIALS 1.14.5-g19190e3b9-release
+The following parameters have been modified:
+
+input {
+  datablock = datablock.json
+}
+
+Setting spotfinder.filter.min_spot_size=3
+Configuring spot finder from input parameters
+--------------------------------------------------------------------------------
+Finding strong spots in imageset 0
+--------------------------------------------------------------------------------
+
+
+Finding spots in image 1 to 1...
+Setting chunksize=1
+Extracting strong pixels from images
+ Using multiprocessing with 1 parallel job(s)
+
+Number of masked pixels for image 0: 526230
+Found 7848 strong pixels on image 1
+
+Extracted 1783 spots
+Removed 1123 spots with size < 3 pixels
+Removed 1 spots with size > 100 pixels
+Calculated 659 spot centroids
+Calculated 659 spot intensities
+Filtered 659 of 659 spots by peak-centroid distance
+
+Histogram of per-image spot count for imageset 0:
+659 spots found on 1 image
+
+--------------------------------------------------------------------------------
+Saved 659 reflections to strong.pickle
+Time Taken: 0.967670
