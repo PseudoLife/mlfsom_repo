@@ -1,0 +1,69 @@
+!==================== SELECTION OF DATA IMAGES ==============================
+NAME_TEMPLATE_OF_DATA_FRAMES= /Users/atakisi/MLFSOM/xds/practice/rt_c02_13_???.cbf 
+
+DATA_RANGE=1  1      !Numbers of first and last data image collected
+BACKGROUND_RANGE=1 1  !Numbers of first and last data image for background
+SPOT_RANGE=1   1   !First and last data image number for finding spots
+
+!======================= DETECTOR AND BEAM =================================
+DETECTOR=PILATUS  MINIMUM_VALID_PIXEL_VALUE=0  OVERLOAD=2000000000
+
+DIRECTION_OF_DETECTOR_X-AXIS= 1.0 0.0 0.0
+DIRECTION_OF_DETECTOR_Y-AXIS= 0.0 1.0 0.0
+INCIDENT_BEAM_DIRECTION=0.0 0.0 1.0
+ROTATION_AXIS= -1.0 0.0 0.0          ! A1, F1, F2, F3
+ORGX=   1296  ORGY=   1276
+DETECTOR_DISTANCE= 400
+OSCILLATION_RANGE= 1.0 
+X-RAY_WAVELENGTH= 0.629       ! Angstroem, F1 as of September 2015 
+
+TRUSTED_REGION=0.0 1.15 !Relative radii limiting trusted detector region
+SENSOR_THICKNESS=0.32
+NX=2463 NY=2527 QX=0.172 QY=0.172   !Pilatus 6M
+! MAXIMUM_NUMBER_OF_PROCESSORS= 4 
+! MAXIMUM_NUMBER_OF_JOBS=16 
+
+!====================== JOB CONTROL PARAMETERS =============================== 
+!JOB= XYCORR INIT COLSPOT
+!JOB= XYCORR INIT COLSPOT IDXREF
+!JOB= XYCORR INIT COLSPOT IDXREF DEFPIX INTEGRATE CORRECT
+
+!====================== GEOMETRICAL PARAMETERS =============================== 
+ FRACTION_OF_POLARIZATION=0.90 !default=0.5 for unpolarized beam
+ POLARIZATION_PLANE_NORMAL= 0.0 1.0 0.0
+ 
+!======================= CRYSTAL PARAMETERS =================================
+SPACE_GROUP_NUMBER=4  !0 for unknown crystals; cell constants are ignored.
+UNIT_CELL_CONSTANTS= 27.0 63.0 60.0 90 90.5 90 
+
+!UNIT_CELL_A-AXIS= no input
+!UNIT_CELL_B-AXIS= no input
+!UNIT_CELL_C-AXIS= no input
+
+!====================== INDEXING PARAMETERS =================================
+SEPMIN=4.0 CLUSTER_RADIUS=2
+
+!============== DECISION CONSTANTS FOR FINDING CRYSTAL SYMMETRY =============
+!Decision constants for detection of lattice symmetry (IDXREF, CORRECT)
+ MAX_CELL_AXIS_ERROR=0.03 ! Maximum relative error in cell axes tolerated
+ MAX_CELL_ANGLE_ERROR=2.0 ! Maximum cell angle error tolerated
+!Decision constants for detection of space group symmetry (CORRECT).
+!Resolution range for accepting reflections for space group determination in
+!the CORRECT step. It should cover a sufficient number of strong reflections.
+ TEST_RESOLUTION_RANGE=8.0 4.5
+ MIN_RFL_Rmeas= 50 ! Minimum #reflections needed for calculation of Rmeas
+ MAX_FAC_Rmeas=2.0 ! Sets an upper limit for acceptable Rmeas
+
+!================= PARAMETERS CONTROLLING REFINEMENTS =======================
+!REFINE(IDXREF)=POSITION BEAM AXIS ORIENTATION CELL
+!REFINE(INTEGRATE)=POSITION BEAM AXIS ORIENTATION CELL 
+!REFINE(CORRECT)=POSITION BEAM AXIS ORIENTATION CELL
+
+!================== CRITERIA FOR ACCEPTING REFLECTIONS ======================
+ VALUE_RANGE_FOR_TRUSTED_DETECTOR_PIXELS= 6000 30000 !Used by DEFPIX
+				   !for excluding shaded parts of the detector.
+ INCLUDE_RESOLUTION_RANGE=50 1.0 !Angstroem; used by DEFPIX,INTEGRATE,CORRECT
+!============== INTEGRATION AND PEAK PROFILE PARAMETERS =====================
+NUMBER_OF_PROFILE_GRID_POINTS_ALONG_ALPHA/BETA=13 !used by: INTEGRATE
+NUMBER_OF_PROFILE_GRID_POINTS_ALONG_GAMMA= 13     !used by: INTEGRATE
+
