@@ -1,4 +1,4 @@
-from math import *
+import math
 import os, time, math, tempfile
 from os.path import join
 import subprocess
