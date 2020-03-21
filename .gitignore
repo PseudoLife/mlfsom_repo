@@ -1,5 +1,6 @@
 .DS_Store
 *.pyc
+*.adxv_beam_center
 
 absolute_scale.map
 ano_sfall_debug.log

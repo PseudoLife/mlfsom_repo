@@ -1,5 +1,5 @@
 
- ***** COLSPOT ***** (VERSION Jan 31, 2020  BUILT=20200131)  13-Mar-2020
+ ***** COLSPOT ***** (VERSION Jan 31, 2020  BUILT=20200131)  20-Mar-2020
 
  INPUT PARAMETER VALUES
  ----------------------
@@ -9,20 +9,20 @@
  CLUSTER_NODES=
  SECONDS=     0
  NAME_TEMPLATE_OF_DATA_FRAMES=/Users/atakisi/MLFSOM/xds/stills_3.0A_5fr_1deg/stills_3.0A_5fr_1deg_???_001.img SMV
- DATA_RANGE=       5       5
+ DATA_RANGE=       3       3
  BACKGROUND_PIXEL=    6.00
  STRONG_PIXEL=    3.00
  MAXIMUM_NUMBER_OF_STRONG_PIXELS=   1500000
  MINIMUM_NUMBER_OF_PIXELS_IN_A_SPOT=    6 SPOT_MAXIMUM-CENTROID=    3.00
- SPOT_RANGE=       5       5
+ SPOT_RANGE=       3       3
  ------------------------------------------------------------------------
 
- Task # 1 scans a subset of       1 images in the range      5 ...     5
+ Task # 1 scans a subset of       1 images in the range      3 ...     3
  ------------------------------------------------------------------------
 
  RESULTS FOR FORKED COLSPOT TASK # 1
  USING    1 OUT OF    1 PROCESSORS
- PROCESS #  1 scans     1  images in the range       5 ...      5
+ PROCESS #  1 scans     1  images in the range       3 ...      3
 
  *** DEFINITION OF SYMBOLS ***
  NBKG      = NUMBER OF BACKGROUND PIXELS ON DATA IMAGE
@@ -33,16 +33,16 @@
              -3: WRONG DATA FORMAT
 
  FRAME #      NBKG     NSTRONG   I/O-FLAG
-       5   5224391        2727       0
+       3   5224508        2610       0
 
- NUMBER OF STRONG PIXELS EXTRACTED FROM IMAGES        2727
+ NUMBER OF STRONG PIXELS EXTRACTED FROM IMAGES        2610
 
- NUMBER OF DIFFRACTION SPOTS LOCATED                   203
+ NUMBER OF DIFFRACTION SPOTS LOCATED                   197
  IGNORED BECAUSE OF SPOT CLOSE TO UNTRUSTED REGION      18
  WEAK SPOTS OMITTED                                      0
- NUMBER OF DIFFRACTION SPOTS ACCEPTED                  185
+ NUMBER OF DIFFRACTION SPOTS ACCEPTED                  179
 
  total elapsed wall-clock time for COLSPOT       0.4 sec
 
  TASK     cpu time (sec)    elapsed wall-clock time (sec)
-   1           0.4                     0.4
+   1           0.3                     0.4
