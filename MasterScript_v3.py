@@ -88,7 +88,7 @@ def GetHomogenousExperimentList(stills, start_mos, k_mos, k_cell, k_bfactor, fra
     Returns a queue of params of exps for mlfsom to calc dose dependent diff.
     for a homogenously illuminated crystal model given by:
     
-    stills: True for stills, False for continuous  data collection e.g. full data set
+    stills: True for stills, False for continuous data collection e.g. full data set
     start_mos: starting value of mos
     k_mos: increase in mosaicity given by mos_0 + k_mos*dose
     k_cell: fractional increase in unit cell dim. given by cell_dimenion_0*(1+k_cell*dose)
@@ -118,11 +118,14 @@ def GetHomogenousExperimentList(stills, start_mos, k_mos, k_cell, k_bfactor, fra
     return experiment_list
 
 
-def RunExperiments(prefix,experiment_list,resolution,solvent_B,threads):
+def RunExperiments(pdb_file,prefix,experiment_list,resolution,solvent_B,threads):
     """
     Used by fn: SpacialDependentCrystal, HomogenousCrystal, RunFromExpQueue
     Runs each exp. and generates the diff pattern defined in experiment_list
     Saves imgs to mlfsom_path and necessary temp files to mlfsom_path/[prefix]
+
+    pdb_file: input pdb file e.g. '1H87.pdb'
+    prefix: name of the exp
     experiment_list: tuple (ID,mos,bfactor_inc,cell_inc,osc)
     resolution: mlfsom default 2.5 A. initial resolution of the diffraction
     solvent_B: mlfsom default 35. does this change during the run at all??? needs more inspection
@@ -133,7 +136,8 @@ def RunExperiments(prefix,experiment_list,resolution,solvent_B,threads):
     time_initial = time.time()
     prev_cwd = os.getcwd()
     os.chdir(os.path.expanduser(mlfsom_path))
-    os.system('cp 1H87.pdb temp.pdb')
+    subprocess.call(['cp', pdb_file, 'temp.pdb'])
+    #os.system('cp 1H87.pdb temp.pdb')
     os.system('rm ' + join(tmp_path,'*')) # clear previous temp files
     
     # set up threading and run exps
@@ -239,12 +243,13 @@ def SpacialDependentCrystal(prefix,N_grid,start_mos,k_mos,k_cell,k_bfactor,\
     return experiment_list
 
 
-def HomogenousCrystal(prefix,stills,start_mos,k_mos,k_cell,k_bfactor,frames,\
+def HomogenousCrystal(pdb_file,prefix,stills,start_mos,k_mos,k_cell,k_bfactor,frames,\
     resolution=2.5,solvent_B=35,osc=.01,flux=8.4e10,threads=4):
     """
     Generates files defining the params of exps for mlfsom to calc
     dose dep. diff. patterns for a homogenous xtl given by:
-
+    
+    pdb_file: input pdb file e.g. 1H87.pdb
     prefix: name of the experiment
     stills: True for stills, False for continuous  data collection e.g. full data set
     start_mos: starting value of moasicty
@@ -276,10 +281,11 @@ def HomogenousCrystal(prefix,stills,start_mos,k_mos,k_cell,k_bfactor,frames,\
     frame_weights = []
     experiment_list = GetHomogenousExperimentList(\
         stills, start_mos, k_mos, k_cell, k_bfactor, frames, osc, flux)
-    WriteDescription(prefix, stills, N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, resolution, \
-    solvent_B, osc, flux, xtal_size, beam_fwhm_x, beam_fwhm_y, threads, frame_weights)
+    WriteDescription(pdb_file, prefix, stills, N_grid, start_mos, k_mos, \
+        k_cell, k_bfactor, frames, resolution, solvent_B, osc, flux, \
+        xtal_size, beam_fwhm_x, beam_fwhm_y, threads, frame_weights)
     WriteExpQueueAndList(prefix,experiment_list)
-    RunExperiments(prefix,experiment_list,resolution,solvent_B,threads)
+    RunExperiments(pdb_file,prefix,experiment_list,resolution,solvent_B,threads)
     # Move files
     os.system('mv ' + join(mlfsom_path,'input*.pdb ') + output_folder)
     os.system('mv ' + join(mlfsom_path,'input*.mtz ') + output_folder)
@@ -305,13 +311,14 @@ def WriteExpQueueAndList(prefix,experiment_list):
 
 
 def WriteDescription(\
-    prefix, stills, N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, resolution, \
+    pdb_file, prefix, stills, N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, resolution, \
     solvent_B, osc, flux, xtal_size, beam_fwhm_x, beam_fwhm_y, threads, frame_weights):
     """
     Used by fn: HomogenousCrystal, SpacialDependentCrystal
     Writes exp. params to a file e.g. exp-prefix-desc.txt
     """
     f = open("exp-"+prefix+"-desc.txt","w")
+    f.write("pdb_file: "+pdb_file+"\n")
     f.write("prefix: "+prefix+"\n")
     f.write("stills: "+str(stills)+"\n")
     f.write("N_grid: "+str(N_grid)+"\n")

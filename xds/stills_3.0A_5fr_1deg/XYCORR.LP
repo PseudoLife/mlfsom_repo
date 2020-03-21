@@ -1,5 +1,5 @@
 
- ***** XYCORR ***** (VERSION Jan 31, 2020  BUILT=20200131)  13-Mar-2020
+ ***** XYCORR ***** (VERSION Jan 31, 2020  BUILT=20200131)  20-Mar-2020
 
  DETECTOR=PILATUS
 
@@ -16,5 +16,5 @@
  NUMBER OF DETECTOR SEGMENTS     1
 
  cpu time used                  0.3 sec
- elapsed wall-clock time        0.3 sec
+ elapsed wall-clock time        0.4 sec
 
