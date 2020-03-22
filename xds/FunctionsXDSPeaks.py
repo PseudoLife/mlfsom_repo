@@ -70,6 +70,8 @@ class XDSAscii:
 					line = 'NAME_TEMPLATE_OF_DATA_FRAMES= %s' %self.name_template
 				if 'OSCILLATION_RANGE' in line:
 					line = 'OSCILLATION_RANGE= %s' %self.description.loc['osc','value']
+				if 'DETECTOR_DISTANCE' in line:
+					line = 'DETECTOR_DISTANCE= %s' %self.description.loc['distance','value']
 				if 'DATA_RANGE' in line:
 					line = 'DATA_RANGE= %i %i' %(int(fnumber),int(fnumber))
 				if 'BACKGROUND_RANGE' in line:
