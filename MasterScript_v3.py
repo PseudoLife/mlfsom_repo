@@ -1,4 +1,3 @@
-from math import *
 import os, time, math, tempfile
 from os.path import join
 import subprocess
@@ -137,7 +136,6 @@ def RunExperiments(pdb_file,prefix,experiment_list,resolution,solvent_B,threads)
     prev_cwd = os.getcwd()
     os.chdir(os.path.expanduser(mlfsom_path))
     subprocess.call(['cp', pdb_file, 'temp.pdb'])
-    #os.system('cp 1H87.pdb temp.pdb')
     os.system('rm ' + join(tmp_path,'*')) # clear previous temp files
     
     # set up threading and run exps
@@ -377,12 +375,13 @@ def RunFromQueue(exp_desc_file,exp_queue_file,threads=None):
     threads: number of frames run at once - uses #threads in the desc file if not specified
     """
     # Read desc file in a dataframe, get the necessary params 
-    df_desc = pd.read_csv(exp_desc_file,sep=': ',engine='python',header=None,index_col=0)
-    prefix = df_desc.loc['prefix',1]
-    resolution = df_desc.loc['resolution',1]
-    solvent_B = df_desc.loc['solvent_B',1]
+    df_desc = pd.read_csv(exp_desc_file,sep=': ',engine='python',header=None,index_col=0,names=['param','value'])
+    pdb_file = df_desc.loc['pdb_file','value']
+    prefix = df_desc.loc['prefix','value']
+    resolution = df_desc.loc['resolution','value']
+    solvent_B = df_desc.loc['solvent_B','value']
     if threads == None:
-        threads = int(df_desc.loc['threads',1])
+        threads = int(df_desc.loc['threads','value'])
 
     # Read queue file, create experiment_list
     with open(exp_queue_file) as myfile:
@@ -391,7 +390,7 @@ def RunFromQueue(exp_desc_file,exp_queue_file,threads=None):
 
     output_folder = join(mlfsom_path,'data_'+prefix)
     os.system('mkdir --parents ' + output_folder)  # create sub-fol to save output files
-    RunExperiments(prefix,experiment_list,resolution,solvent_B,threads)
+    RunExperiments(pdb_file,prefix,experiment_list,resolution,solvent_B,threads)
     # Move files
     os.system('mv ' + join(mlfsom_path,'input*.pdb ') + output_folder)
     os.system('mv ' + join(mlfsom_path,'input*.mtz ') + output_folder)
