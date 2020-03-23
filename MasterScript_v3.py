@@ -1,7 +1,8 @@
 import os, time, math, tempfile
 from os.path import join
 import subprocess
-import multiprocessing as mp
+#import multiprocessing as mp
+import pathos.multiprocessing as mp
 from glob import glob
 import pandas as pd
 
@@ -81,7 +82,7 @@ def GetExperimentList(N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, \
     return (frame_weights,experiment_list)
 
 
-def GetHomogenousExperimentList(stills, start_mos, k_mos, k_cell, k_bfactor, frames, osc, flux):
+def GetHomogenousExperimentList(stills, start_mos, k_mos, k_cell, k_bfactor, frames, osc, distance, flux):
     """
     Used by fn: HomogenousCrystal
     Returns a queue of params of exps for mlfsom to calc dose dependent diff.
@@ -94,11 +95,12 @@ def GetHomogenousExperimentList(stills, start_mos, k_mos, k_cell, k_bfactor, fra
     k_bfactor: increase in b-factors given by B_0 + k_bfactor*dose
     frames: number of frames
     osc: angle in degrees xtl rotates for each angle slice (0.01 is good for stills)
+    distance: in mm e.g. 250 is good for lysozyme
     flux: in ph/s
 
     Note: the dose in each frame is given by frame*1
     Returns list of exp. params to be calc by mlfsom:
-    (ID,mos,bfactor_inc,cell_inc,osc,phi,sub_flux,sub_xtal_size,sub_beam_size)
+    (ID,mos,bfactor_inc,cell_inc,osc,phi,distance,sub_flux,sub_xtal_size,sub_beam_size)
     """
     experiment_list=[]  # tuple(ID,mos,bfactor_inc,cell_inc,osc,sub_flux,sub_xtal_size,sub_beam_size)
     xtal_size = 77.8  # some exp. constants for homogenous beam case
@@ -112,8 +114,8 @@ def GetHomogenousExperimentList(stills, start_mos, k_mos, k_cell, k_bfactor, fra
             phi = 342.0 + frame*osc
         experiment_list.append(\
             (ID, round(start_mos+k_mos*dose,3), round(k_bfactor*dose,2),\
-             round(k_cell*dose,4), osc, round(phi,2), "%.2e" %flux, xtal_size, beam_size))
-    # experiment_list: (ID,mos,bfactor_inc,cell_inc,osc,phi,sub_flux,sub_xtal_size,sub_beam_size)
+             round(k_cell*dose,4), osc, round(phi,2), round(distance,3), "%.2e" %flux, xtal_size, beam_size))
+    # experiment_list: (ID,mos,bfactor_inc,cell_inc,osc,phi,distance,sub_flux,sub_xtal_size,sub_beam_size)
     return experiment_list
 
 
@@ -174,24 +176,25 @@ def RunExperiment(experiment_and_prefix):
     Used by fn: RunExperiments
     Runs mlfsom with params defined by exp and outprefix
     experiment_and_prefix: two tuple
-    first is exp params => (ID,mos,bfactor_inc,cell_inc,osc,phi,sub_flux,sub_xtal_size,sub_beam_size)
+    first is exp params => (ID,mos,bfactor_inc,cell_inc,osc,phi,distance,sub_flux,sub_xtal_size,sub_beam_size)
     second is prefix
     Images are saved as {prefix}###_001.img, where ### is the ID
     """
-    # (ID,mos,bfactor_inc,cell_inc,osc,phi,sub_flux,sub_xtal_size,sub_beam_size)
+    # (ID,mos,bfactor_inc,cell_inc,osc,phi,distance,sub_flux,sub_xtal_size,sub_beam_size)
     experiment = experiment_and_prefix[0]
     prefix = experiment_and_prefix[1]
-    ID,mos,bfactor_inc,cell_inc,osc,phi,sub_flux,sub_xtal_size,sub_beam_size = experiment
+    ID,mos,bfactor_inc,cell_inc,osc,phi,distance,sub_flux,sub_xtal_size,sub_beam_size = experiment
     output_folder = join(mlfsom_path,'data_'+prefix)
     os.system('mkdir --parents ' + output_folder)  # create sub-fol to save output files
     # IS THE PRINT COMMAND BELOW REALLY NECESSARY???
     print ( ' '.join(['\n------ RUNNING ID='+str(ID), 'mos='+str(mos), 'bfactor_inc='+str(bfactor_inc),\
-        'cell_inc='+str(cell_inc), 'osc='+str(osc), 'phi='+str(phi), 'sub_flux='+str(sub_flux),\
-        'sub_xtal_size='+str(sub_xtal_size), 'sub_beam_size='+str(sub_beam_size), '\n']) )
+        'cell_inc='+str(cell_inc), 'osc='+str(osc), 'phi='+str(phi), 'distance='+str(distance), 
+        'sub_flux='+str(sub_flux), 'sub_xtal_size='+str(sub_xtal_size), 'sub_beam_size='+str(sub_beam_size), '\n']) )
     subprocess.call([\
         './mlfsom.com', join(output_folder,prefix+'_'+str(ID)+'_001.img'), 'input'+str(ID)+'.mtz',\
-        'frames=1', 'id='+str(ID), 'mosaic='+str(mos), 'osc='+str(osc), 'phi='+str(phi),\
-        'flux='+str(sub_flux), 'xtal_size='+str(sub_xtal_size), 'beam_size='+str(sub_beam_size)])
+        'frames=1', 'id='+str(ID), 'mosaic='+str(mos), 'osc='+str(osc), 'phi='+str(phi), \
+        'distance='+str(distance), 'flux='+str(sub_flux), \
+        'xtal_size='+str(sub_xtal_size), 'beam_size='+str(sub_beam_size)])
     print('------------------ ID: '+str(ID)+' DONE ------------------')
 
 
@@ -242,7 +245,7 @@ def SpacialDependentCrystal(prefix,N_grid,start_mos,k_mos,k_cell,k_bfactor,\
 
 
 def HomogenousCrystal(pdb_file,prefix,stills,start_mos,k_mos,k_cell,k_bfactor,frames,\
-    resolution=2.5,solvent_B=35,osc=.01,flux=8.4e10,threads=4):
+    resolution=2.5,solvent_B=35,osc=.01,distance=250,flux=8.4e10,threads=4):
     """
     Generates files defining the params of exps for mlfsom to calc
     dose dep. diff. patterns for a homogenous xtl given by:
@@ -266,7 +269,7 @@ def HomogenousCrystal(pdb_file,prefix,stills,start_mos,k_mos,k_cell,k_bfactor,fr
     exp-{prefix}-queue.txt - list of exps to be run, intended to be used in RunFromQueue
     exp-{prefix}-list.txt - back up list of exps
     Returns tuple of list of params for exps to be calc by mlfsom:
-    (ID,mos,bfactor_inc,cell_inc,osc,phi,sub_flux,sub_xtal_size,sub_beam_size)
+    (ID,mos,bfactor_inc,cell_inc,osc,phi,distance,sub_flux,sub_xtal_size,sub_beam_size)
     """
     output_folder = join(mlfsom_path,'data_'+prefix)
     os.system('mkdir --parents ' + output_folder)  # create sub-fol to save output files
@@ -278,9 +281,9 @@ def HomogenousCrystal(pdb_file,prefix,stills,start_mos,k_mos,k_cell,k_bfactor,fr
     beam_fwhm_y = 100
     frame_weights = []
     experiment_list = GetHomogenousExperimentList(\
-        stills, start_mos, k_mos, k_cell, k_bfactor, frames, osc, flux)
+        stills, start_mos, k_mos, k_cell, k_bfactor, frames, osc, distance, flux)
     WriteDescription(pdb_file, prefix, stills, N_grid, start_mos, k_mos, \
-        k_cell, k_bfactor, frames, resolution, solvent_B, osc, flux, \
+        k_cell, k_bfactor, frames, resolution, solvent_B, osc, distance, flux, \
         xtal_size, beam_fwhm_x, beam_fwhm_y, threads, frame_weights)
     WriteExpQueueAndList(prefix,experiment_list)
     RunExperiments(pdb_file,prefix,experiment_list,resolution,solvent_B,threads)
@@ -296,7 +299,7 @@ def WriteExpQueueAndList(prefix,experiment_list):
     Used by fn: HomogenousCrystal, SpacialDependentCrystal
     Writes list of exps to exp-{prefix}-queue.txt and exp-{prefix}-list.txt
     experiment_list: list of tuples defing exp params:
-    (ID,mos,bfactor_inc,cell_inc,osc,phi,sub_flux,sub_xtal_size,sub_beam_size)
+    (ID,mos,bfactor_inc,cell_inc,osc,phi,distance,sub_flux,sub_xtal_size,sub_beam_size)
     prefix: name of exp
     """
     f_queue=open("exp-"+prefix+"-queue.txt","w")
@@ -310,7 +313,7 @@ def WriteExpQueueAndList(prefix,experiment_list):
 
 def WriteDescription(\
     pdb_file, prefix, stills, N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, resolution, \
-    solvent_B, osc, flux, xtal_size, beam_fwhm_x, beam_fwhm_y, threads, frame_weights):
+    solvent_B, osc, distance, flux, xtal_size, beam_fwhm_x, beam_fwhm_y, threads, frame_weights):
     """
     Used by fn: HomogenousCrystal, SpacialDependentCrystal
     Writes exp. params to a file e.g. exp-prefix-desc.txt
@@ -328,6 +331,7 @@ def WriteDescription(\
     f.write("resolution: "+str(resolution)+"\n")
     f.write("solvent_B: "+str(solvent_B)+"\n")
     f.write("osc: "+str(osc)+"\n")
+    f.write("distance: "+str(distance)+"\n")
     f.write("flux: "+"%.2e" %flux + "\n")
     f.write("xtal_size: "+str(xtal_size)+"\n")
     f.write("beam_fwhm_x: "+str(beam_fwhm_x)+"\n")
