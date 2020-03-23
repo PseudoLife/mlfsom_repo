@@ -45,17 +45,33 @@ class XDSAscii:
 		self.dir_name = os.path.dirname(self.name_template)
 		self.base_name = os.path.basename(self.name_template)
 		# read desc file into a df assuming it is inside folder
-		self.description = pd.read_csv( glob(join(self.dir_name,'*desc.txt'))[0],\
-			header=None,sep=': ',engine='python', index_col=0,names=['value'] )
+		if glob(join(self.dir_name,'*desc.txt')) == []:
+			print "MyError: Description file is missing in the current folder!"
+		else:
+			self.description = pd.read_csv( glob(join(self.dir_name,'*desc.txt'))[0],\
+				header=None,sep=': ',engine='python', index_col=0,names=['value'] )
 		
+			# read unit cell params and space group from the original pdb file if exists
+			pdb_file = self.description.loc['pdb_file','value']
+			if not os.path.isfile(pdb_file):
+				print "MyError: Please place the original pdb file (%s) in the folder!" %pdb_file
+			else:
+				with open(self.description.loc['pdb_file','value']) as myfile:
+					for line in myfile:
+						if 'CRYST1' in line:
+							unit_cell = tuple(line.split()[1:7])
+							self.unit_cell = unit_cell
+							space_group = line.split()[11]
+							self.space_group = space_group
+							break
 
-	def ProcessStills(self,unit_cell,space_group):
+
+	def ProcessStills(self):
 		"""
 		Processes fake img files using XDS (indexing, integrating, correcting)
 		Renames and saves CORRECT.LP and XDS_ASCII.HKL files from eachs still frame
 		e.g. name_template = '/Users/atakisi/MLFSOM/xds/stills_3.0A_5fr_1deg/stills_3.0A_5fr_1deg_???_001.img'
-		unit_cell: tuple e.g. (77.25, 77.25, 38.66, 90.0, 90.0, 90.0)
-		space_group: int e.g. 96 for P43212
+		desc file and the original pdb file must be under the folder for this to work
 		"""
 		cwd = os.getcwd()
 		os.chdir(self.dir_name)
@@ -80,9 +96,9 @@ class XDSAscii:
 					line = 'SPOT_RANGE= %i %i' %(int(fnumber),int(fnumber))
 				if 'UNIT_CELL_CONSTANTS' in line:
 					line = 'UNIT_CELL_CONSTANTS= %s' \
-					%(' '.join([str(x) for x in unit_cell]))
+					%(' '.join([str(x) for x in self.unit_cell]))
 				if 'SPACE_GROUP_NUMBER' in line:
-					line = 'SPACE_GROUP_NUMBER= %i' %(space_group)
+					line = 'SPACE_GROUP_NUMBER= %s' %(self.space_group)
 				print line
 
 			subprocess.call(['xds'])
@@ -127,7 +143,7 @@ class XDSAscii:
 		os.chdir(self.dir_name)
 
 		LP_list = [x for x in os.listdir(self.dir_name) if x.startswith('CORRECT_') and x.endswith('.LP')]
-		mosaicity_cell_byframe = pd.DataFrame(columns=['mosaicity','cellA','cellC'])
+		mosaicity_cell_byframe = pd.DataFrame(columns=['mosaicity','cellA','cellB','cellC'])
 
 		for LP_file in LP_list:
 			for line in fileinput.FileInput(LP_file):
@@ -136,6 +152,7 @@ class XDSAscii:
 					mosaicity_cell_byframe.loc[fnumber,'mosaicity'] = float(line.split()[-1])
 				if 'UNIT CELL PARAMETERS' in line:
 					mosaicity_cell_byframe.loc[fnumber,'cellA'] = float(line.split()[3])
+					mosaicity_cell_byframe.loc[fnumber,'cellB'] = float(line.split()[4])
 					mosaicity_cell_byframe.loc[fnumber,'cellC'] = float(line.split()[5])
 		
 		mosaicity_cell_byframe.sort_index(inplace=True)
@@ -321,7 +338,7 @@ class XDSAscii:
 		return df_shells
 
 
-
+"""
 if __name__ == "__main__":
 	#name_template = '/Users/atakisi/MLFSOM/xds/stills_3.0A_5fr_1deg/stills_3.0A_5fr_1deg_???_001.img'
 	name_template = '/Users/atakisi/MLFSOM/xds/stills_2.0A_50fr_1deg/stills_2.0A_50fr_1deg_???_001.img'
@@ -331,4 +348,4 @@ if __name__ == "__main__":
 	#asciObj.ProcessStills(unit_cell,space_group)
 	asci = asciObj.ReadAllAscii()
 	shells = asciObj.PlotShellIntensities(asci,N_shells=15)
-
+"""
