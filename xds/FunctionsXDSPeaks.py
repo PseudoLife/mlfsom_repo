@@ -98,7 +98,7 @@ class XDSAscii:
 					line = 'UNIT_CELL_CONSTANTS= %s' \
 					%(' '.join([str(x) for x in self.unit_cell]))
 				if 'SPACE_GROUP_NUMBER' in line:
-					line = 'SPACE_GROUP_NUMBER= %s' %(self.space_group)
+					line = 'SPACE_GROUP_NUMBER= %i' %(self.space_group)
 				print line
 
 			subprocess.call(['xds'])
