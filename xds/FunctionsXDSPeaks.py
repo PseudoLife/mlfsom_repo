@@ -40,10 +40,11 @@ def ReadSingleXDSAscii(in_ascii):
 
 class XDSAscii:
 
-	def __init__(self,name_template):
+	def __init__(self,name_template,space_group):
 		self.name_template = name_template
 		self.dir_name = os.path.dirname(self.name_template)
 		self.base_name = os.path.basename(self.name_template)
+		self.space_group = space_group
 		# read desc file into a df assuming it is inside folder
 		if glob(join(self.dir_name,'*desc.txt')) == []:
 			print "MyError: Description file is missing in the current folder!"
@@ -61,8 +62,6 @@ class XDSAscii:
 						if 'CRYST1' in line:
 							unit_cell = tuple(line.split()[1:7])
 							self.unit_cell = unit_cell
-							space_group = line.split()[-1]
-							self.space_group = space_group
 							break
 
 
