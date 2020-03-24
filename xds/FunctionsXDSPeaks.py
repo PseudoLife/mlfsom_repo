@@ -52,16 +52,16 @@ class XDSAscii:
 				header=None,sep=': ',engine='python', index_col=0,names=['value'] )
 		
 			# read unit cell params and space group from the original pdb file if exists
-			pdb_file = self.description.loc['pdb_file','value']
+			pdb_file = join(self.dir_name,self.description.loc['pdb_file','value'])
 			if not os.path.isfile(pdb_file):
 				print "MyError: Please place the original pdb file (%s) in the folder!" %pdb_file
 			else:
-				with open(self.description.loc['pdb_file','value']) as myfile:
+				with open(pdb_file) as myfile:
 					for line in myfile:
 						if 'CRYST1' in line:
 							unit_cell = tuple(line.split()[1:7])
 							self.unit_cell = unit_cell
-							space_group = line.split()[11]
+							space_group = line.split()[-1]
 							self.space_group = space_group
 							break
 
@@ -70,7 +70,6 @@ class XDSAscii:
 		"""
 		Processes fake img files using XDS (indexing, integrating, correcting)
 		Renames and saves CORRECT.LP and XDS_ASCII.HKL files from eachs still frame
-		e.g. name_template = '/Users/atakisi/MLFSOM/xds/stills_3.0A_5fr_1deg/stills_3.0A_5fr_1deg_???_001.img'
 		desc file and the original pdb file must be under the folder for this to work
 		"""
 		cwd = os.getcwd()
@@ -86,6 +85,8 @@ class XDSAscii:
 					line = 'NAME_TEMPLATE_OF_DATA_FRAMES= %s' %self.name_template
 				if 'OSCILLATION_RANGE' in line:
 					line = 'OSCILLATION_RANGE= %s' %self.description.loc['osc','value']
+				if 'INCLUDE_RESOLUTION_RANGE' in line:
+					line = 'INCLUDE_RESOLUTION_RANGE= 100 %s' %self.description.loc['resolution','value']
 				if 'DETECTOR_DISTANCE' in line:
 					line = 'DETECTOR_DISTANCE= %s' %self.description.loc['distance','value']
 				if 'DATA_RANGE' in line:
@@ -110,7 +111,6 @@ class XDSAscii:
 	def ReadAllAscii(self):
 		"""
 		Reads multi XDS_ASCII.HKL files and merges them into a single dataframe
-		e.g. name_template = '/Users/atakisi/MLFSOM/xds/stills_3.0A_5fr_1deg/stills_3.0A_5fr_1deg_???_001.img'
 		"""
 		cwd = os.getcwd()
 		os.chdir(self.dir_name)
@@ -119,16 +119,13 @@ class XDSAscii:
 		for asci_file in asci_list:
 			fnumber = int(asci_file.split('_')[2][0:3])
 			asci = ReadSingleXDSAscii(asci_file)
+
 			asci.drop(columns=['h','k','l','sigIasci','psi'],inplace=True)
 			asci.rename(columns={'Iasci':'I_'+str(fnumber), 'xd':'xd_'+str(fnumber), 'yd':'yd_'+str(fnumber),\
 				'zd':'zd_'+str(fnumber), 'rlp':'rlp_'+str(fnumber), 'peak':'peak_'+str(fnumber), \
 				'corr':'corr_'+str(fnumber), 'res':'res_'+str(fnumber)}, inplace=True)
 			asci_byframe = asci_byframe.join(asci, how='outer')
 
-		# XDS finds many fake peaks beyond the resolution of the data set, so get rid of them!
-		resolution = float(self.description.loc['resolution','value'])
-		asci_byframe = asci_byframe[ asci_byframe['res_'+str(fnumber)] >= resolution ]
-		
 		os.chdir(cwd)
 		return asci_byframe
 
@@ -137,7 +134,6 @@ class XDSAscii:
 		"""
 		Reads mosaicity and unit cell-a and unit cell-c from CORRECT.LP files
 		Returns dataframe
-		e.g. name_template = '/Users/atakisi/MLFSOM/xds/stills_3.0A_5fr_1deg/stills_3.0A_5fr_1deg_???_001.img'
 		"""
 		cwd = os.getcwd()
 		os.chdir(self.dir_name)
@@ -340,12 +336,5 @@ class XDSAscii:
 
 """
 if __name__ == "__main__":
-	#name_template = '/Users/atakisi/MLFSOM/xds/stills_3.0A_5fr_1deg/stills_3.0A_5fr_1deg_???_001.img'
 	name_template = '/Users/atakisi/MLFSOM/xds/stills_2.0A_50fr_1deg/stills_2.0A_50fr_1deg_???_001.img'
-	unit_cell = (77.25, 77.25, 38.66, 90.0, 90.0, 90.0)
-	space_group = 96
-	asciObj = XDSAscii(name_template)
-	#asciObj.ProcessStills(unit_cell,space_group)
-	asci = asciObj.ReadAllAscii()
-	shells = asciObj.PlotShellIntensities(asci,N_shells=15)
 """
