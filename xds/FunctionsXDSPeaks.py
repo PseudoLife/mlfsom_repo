@@ -129,7 +129,7 @@ class XDSAscii:
 		return asci_byframe
 
 
-	def ReadMosCell(self):
+	def ReadMosCellBfac(self):
 		"""
 		Reads mosaicity and unit cell-a and unit cell-c from CORRECT.LP files
 		Returns dataframe
@@ -138,21 +138,23 @@ class XDSAscii:
 		os.chdir(self.dir_name)
 
 		LP_list = [x for x in os.listdir(self.dir_name) if x.startswith('CORRECT_') and x.endswith('.LP')]
-		mosaicity_cell_byframe = pd.DataFrame(columns=['mosaicity','cellA','cellB','cellC'])
+		results_byframe = pd.DataFrame(columns=['mosaicity','cellA','cellB','cellC','wilsonB'])
 
 		for LP_file in LP_list:
 			for line in fileinput.FileInput(LP_file):
 				fnumber = int(LP_file.split('_')[1][0:3])
 				if 'CRYSTAL MOSAICITY (DEGREES)' in line:
-					mosaicity_cell_byframe.loc[fnumber,'mosaicity'] = float(line.split()[-1])
+					results_byframe.loc[fnumber,'mosaicity'] = float(line.split()[-1])
 				if 'UNIT CELL PARAMETERS' in line:
-					mosaicity_cell_byframe.loc[fnumber,'cellA'] = float(line.split()[3])
-					mosaicity_cell_byframe.loc[fnumber,'cellB'] = float(line.split()[4])
-					mosaicity_cell_byframe.loc[fnumber,'cellC'] = float(line.split()[5])
+					results_byframe.loc[fnumber,'cellA'] = float(line.split()[3])
+					results_byframe.loc[fnumber,'cellB'] = float(line.split()[4])
+					results_byframe.loc[fnumber,'cellC'] = float(line.split()[5])
+				if 'WILSON LINE' in line:
+					results_byframe.loc[fnumber,'wilsonB'] = float(line.split()[9])
 		
-		mosaicity_cell_byframe.sort_index(inplace=True)
+		results_byframe.sort_index(inplace=True)
 		os.chdir(cwd)
-		return mosaicity_cell_byframe
+		return results_byframe
 
 
 	def PlotPeakIntensities(self,asci_byframe,first_N_peaks=None,save_img=False):
