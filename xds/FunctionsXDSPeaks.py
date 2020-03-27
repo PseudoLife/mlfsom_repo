@@ -1,4 +1,4 @@
-import os, fileinput, subprocess
+import os, fileinput, subprocess, pickle
 from glob import glob
 from os.path import join
 import pandas as pd
@@ -255,9 +255,19 @@ class XDSAscii:
 		df_peaks['res'] = df_peaks[res_cols].apply(np.mean,axis=1)
 		df_peaks.sort_values('res',ascending=False,inplace=True)
 
-		# Equal number of peaks in each shell
-		peaks_per_shell = int(len(df_peaks)/float(N_shells))
-		peaks_each_shell = np.ones(N_shells).astype(int) * peaks_per_shell 
+		'''
+		### SWITCH - unequal number of peaks: exponantial distribution #######################
+		npeak_ratio = 5    # ratio of the N of peaks in highest to lowest res. shell
+		print 'npeak_ratio: %i' %npeak_ratio
+		alpha = np.log(npeak_ratio)/N_shells  
+		x = np.arange(N_shells)
+		peaks_each_shell = np.exp(alpha*x)/sum(np.exp(alpha*x)) * len(df_peaks)
+		peaks_each_shell = peaks_each_shell.astype(int) 
+		'''
+		### SWITCH - equal number of peaks ############################
+		peaks_per_shell = int( len(df_peaks)/float(N_shells) )
+		peaks_each_shell = np.ones(N_shells).astype(int) * peaks_per_shell
+		
 
 		# get the relevant intensity columns
 		cols = [x for x in df_peaks.columns if x.startswith('I_')]
@@ -338,4 +348,13 @@ class XDSAscii:
 """
 if __name__ == "__main__":
 	name_template = '/Users/atakisi/MLFSOM/xds/stills_2.0A_50fr_1deg/stills_2.0A_50fr_1deg_???_001.img'
+	obj = XDSAscii(name_template,96)
+	#asci = obj.ReadAllAscii()
+	#pickle.dump(asci,open('asci.pickle','w'))
+	asci = pickle.load(open('asci.pickle'))
+	shells = obj.PlotShellIntensities(asci)
+	print asci.shape[0]
+	print shells.N_peaks.sum()
+	print shells
+	obj.PlotShellIntensities(asci)
 """
