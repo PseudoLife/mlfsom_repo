@@ -64,6 +64,20 @@ class XDSAscii:
 							self.unit_cell = unit_cell
 							break
 
+	def ReindexImages(self):
+		"""
+		Reindexes mlfsom frame numbers so that they start from 1 with leading zeros e.g. 001, 056 
+		"""
+		cwd = os.getcwd()
+		os.chdir(self.dir_name)
+		img_list = [x for x in os.listdir('.') if x.endswith('.img')]
+		fr_idx = self.base_name.split('_').index('???')
+		for img in img_list:
+			new_name = '_'.join( img.split('_')[0:fr_idx] + \
+				[('00'+str(int(img.split('_')[fr_idx])+1))[-3::]] + img.split('_')[fr_idx+1::] )
+			os.rename(img,new_name)
+		os.chdir(cwd)
+
 
 	def ProcessStills(self):
 		"""
@@ -317,8 +331,8 @@ class XDSAscii:
 				%(toPrecision(d_max,3),toPrecision(d_min,3),toPrecision(half_dose,3)))
 
 		ax.set_yscale('log')
-		leg = ax.legend(fontsize='xx-small',markerscale=0)
-		leg.set_title('Resolution ($\mathrm{\AA)}$ | $D_{1/2}$',prop={'size':'xx-small'})
+		leg = ax.legend(fontsize='x-small',markerscale=0)
+		leg.set_title('Resolution ($\mathrm{\AA)}$ | $D_{1/2}$',prop={'size':'x-small'})
 		ax.set_xlabel('Frame Number',fontsize='x-large')
 		ax.set_ylabel('XDS Integrated Intensity \n(indexed-corrected)',fontsize='x-large')
 		ax.tick_params(labelsize='large')
