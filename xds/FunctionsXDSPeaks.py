@@ -94,24 +94,24 @@ class XDSAscii:
 
 			for line in fileinput.FileInput('XDS.INP',inplace=True):
 				line = line.strip()
-				if 'NAME_TEMPLATE_OF_DATA_FRAMES' in line:
+				if 'NAME_TEMPLATE_OF_DATA_FRAMES=' in line:
 					line = 'NAME_TEMPLATE_OF_DATA_FRAMES= %s' %self.name_template
-				if 'OSCILLATION_RANGE' in line:
+				if 'OSCILLATION_RANGE=' in line:
 					line = 'OSCILLATION_RANGE= %s' %self.description.loc['osc','value']
-				if 'INCLUDE_RESOLUTION_RANGE' in line:
+				if 'INCLUDE_RESOLUTION_RANGE=' in line:
 					line = 'INCLUDE_RESOLUTION_RANGE= 100 %s' %self.description.loc['resolution','value']
-				if 'DETECTOR_DISTANCE' in line:
+				if 'DETECTOR_DISTANCE=' in line:
 					line = 'DETECTOR_DISTANCE= %s' %self.description.loc['distance','value']
-				if 'DATA_RANGE' in line:
+				if 'DATA_RANGE=' in line:
 					line = 'DATA_RANGE= %i %i' %(int(fnumber),int(fnumber))
-				if 'BACKGROUND_RANGE' in line:
+				if 'BACKGROUND_RANGE=' in line:
 					line = 'BACKGROUND_RANGE= %i %i' %(int(fnumber),int(fnumber))
-				if 'SPOT_RANGE' in line:
+				if 'SPOT_RANGE=' in line:
 					line = 'SPOT_RANGE= %i %i' %(int(fnumber),int(fnumber))
-				if 'UNIT_CELL_CONSTANTS' in line:
+				if 'UNIT_CELL_CONSTANTS=' in line:
 					line = 'UNIT_CELL_CONSTANTS= %s' \
 					%(' '.join([str(x) for x in self.unit_cell]))
-				if 'SPACE_GROUP_NUMBER' in line:
+				if 'SPACE_GROUP_NUMBER=' in line:
 					line = 'SPACE_GROUP_NUMBER= %i' %(self.space_group)
 				print line
 
@@ -138,6 +138,11 @@ class XDSAscii:
 				'zd':'zd_'+str(fnumber), 'rlp':'rlp_'+str(fnumber), 'peak':'peak_'+str(fnumber), \
 				'corr':'corr_'+str(fnumber), 'res':'res_'+str(fnumber)}, inplace=True)
 			asci_byframe = asci_byframe.join(asci, how='outer')
+
+		# Sort columns so that cols go like I_1, xd_1, ..., I_2, xd_2, ...
+		cols = asci_byframe.columns.tolist()
+		cols.sort(key=lambda x: int(x.split('_')[1]))
+		asci_byframe = asci_byframe[cols]
 
 		os.chdir(cwd)
 		return asci_byframe
@@ -169,6 +174,80 @@ class XDSAscii:
 		results_byframe.sort_index(inplace=True)
 		os.chdir(cwd)
 		return results_byframe
+
+
+	def PlotMosCellBfac(self,save_img=False):
+		"""
+		Reads refined mosaicity, cell and Bfac from CORRECT.LP files
+		Plots along with mlfsom input values 
+		"""
+		mcb = self.ReadMosCellBfac()
+		plt.close('all')
+		fig, axs = plt.subplots(2,3,sharex=True)
+		plt.ion()
+
+		frames = int(self.description.loc['frames','value'])
+		
+		# Mosaicity
+		axs[0,0].scatter(mcb.index,mcb.mosaicity,label='XDS refined',facecolor='tab:blue',s=30)
+		axs[0,0].set_ylabel('Mosaicity')
+		start_mos = float(self.description.loc['start_mos','value'])
+		k_mos = float(self.description.loc['k_mos','value'])
+		input_mos = np.linspace(start_mos,start_mos+k_mos*(frames-1),frames)
+		axs[0,0].plot(np.arange(frames),input_mos,label='MLFSOM input',color='black',linewidth=3)
+
+		# B-factor
+		axs[0,1].scatter(mcb.index,mcb.wilsonB,label='XDS refined',facecolor='tab:orange',s=30)
+		axs[0,1].set_ylabel('B-factor')
+		k_bfactor = float(self.description.loc['k_bfactor','value'])
+		with open(join(self.dir_name,self.description.loc['pdb_file','value'])) as myfile:
+			for line in myfile:
+				if 'MEAN B VALUE' in line:
+					start_bfactor = line.split()[-1]
+					break
+		if start_bfactor != 'NULL':
+			start_bfactor = float(start_bfactor)
+			input_bfactor = np.linspace(start_bfactor,start_bfactor+k_bfactor*(frames-1),frames)
+			axs[0,1].plot(np.arange(frames),input_bfactor,label='MLFSOM input',color='black',linewidth=3)
+		
+
+		start_cellA, start_cellB, start_cellC = [ float(x) for x in self.unit_cell[0:3] ]
+		k_cell = float(self.description.loc['k_cell','value'])
+		# Cell-A
+		axs[1,0].scatter(mcb.index,mcb.cellA,label='XDS refined',facecolor='tab:green',s=30)
+		axs[1,0].set_ylabel('Cell-A')
+		input_cellA = np.linspace(start_cellA, start_cellA+start_cellA*k_cell*(frames-1),frames)
+		axs[1,0].plot(np.arange(frames),input_cellA,label='MLFSOM input',color='black',linewidth=3)
+
+		# Cell-B
+		axs[1,1].scatter(mcb.index,mcb.cellB,label='XDS refined',facecolor='tab:red',s=30)
+		axs[1,1].set_ylabel('Cell-B')
+		input_cellB = np.linspace(start_cellB, start_cellB+start_cellB*k_cell*(frames-1),frames)
+		axs[1,1].plot(np.arange(frames),input_cellB,label='MLFSOM input',color='black',linewidth=3)
+
+		# Cell-C
+		axs[1,2].scatter(mcb.index,mcb.cellC,label='XDS refined',facecolor='tab:purple',s=30)
+		axs[1,2].set_ylabel('Cell-C')
+		input_cellC = np.linspace(start_cellC, start_cellC+start_cellC*k_cell*(frames-1),frames)
+		axs[1,2].plot(np.arange(frames),input_cellC,label='MLFSOM input',color='black',linewidth=3)
+
+		# General figure settings applied to every subplot
+		for row in range(2):
+			for col in range(3):
+				axs[row,col].legend(fontsize='xx-small')
+				axs[row,col].tick_params()
+				axs[row,col].xaxis.set_minor_locator(AutoMinorLocator())	
+				axs[row,col].yaxis.set_minor_locator(AutoMinorLocator())
+				axs[row,col].tick_params(axis='both', which='both', length=0)
+				axs[row,col].grid(which='major',linewidth=0.2)
+				axs[row,col].grid(which='minor',linewidth=0.1)				
+				axs[row,col].set_facecolor('0.97')
+				for axis in ['top','bottom','left','right']: axs[row,col].spines[axis].set_visible(False)
+
+		plt.tight_layout()
+		if save_img:
+			fig.savefig( join(self.dir_name,"fig_XDS_MosCellBfac.png"), dpi=300 )
+		plt.show()
 
 
 	def PlotPeakIntensities(self,asci_byframe,first_N_peaks=None,save_img=False):
@@ -213,7 +292,7 @@ class XDSAscii:
 		for axis in ['top','bottom','left','right']: ax.spines[axis].set_visible(False)
 		plt.tight_layout()
 		if save_img:
-			fig.savefig( join(self.dir_name,"fig_peakIntensities.png"), dpi=300 )
+			fig.savefig( join(self.dir_name,"fig_XDS_peakIntensities.png"), dpi=200 )
 		plt.show()
 
 
@@ -254,7 +333,7 @@ class XDSAscii:
 		for axis in ['top','bottom','left','right']: ax.spines[axis].set_visible(False)
 		plt.tight_layout()
 		if save_img:
-			fig.savefig( join(self.dir_name,"fig_intIntensities.png"), dpi=300 )
+			fig.savefig( join(self.dir_name,"fig_XDS_intIntensities.png"), dpi=200 )
 		plt.show()
 
 
@@ -270,7 +349,7 @@ class XDSAscii:
 		df_peaks.sort_values('res',ascending=False,inplace=True)
 
 		'''
-		### SWITCH - unequal number of peaks: exponantial distribution #######################
+		### SWITCH - unequal number of peaks ###########################
 		npeak_ratio = 5    # ratio of the N of peaks in highest to lowest res. shell
 		print 'npeak_ratio: %i' %npeak_ratio
 		alpha = np.log(npeak_ratio)/N_shells  
@@ -323,7 +402,7 @@ class XDSAscii:
 		Takes peak intensities and plots peak intensities by shell on log scale
 		Returns dataframe of shells with int. int., d_min, d_max, n-peaks and D_half in each shell
 		"""
-		df_shells = self.ShellIntensities(asci_byframe,N_shells,normalized=True)
+		df_shells = self.ShellIntensities(asci_byframe,N_shells,normalized=normalized)
 		plt.close('all')
 		fig, ax = plt.subplots()
 		plt.ion()
@@ -354,21 +433,59 @@ class XDSAscii:
 		for axis in ['top','bottom','left','right']: ax.spines[axis].set_visible(False)
 		plt.tight_layout()
 		if save_img:
-			fig.savefig(join(self.dir_name,"fig_shellIntensities.png"),dpi=300)
+			fig.savefig(join(self.dir_name,"fig_XDS_shellintensities.png"),dpi=200)
 		plt.show()
 		return df_shells
 
 
+	def PlotDhalfvsResolution(self,asci_byframe,N_shells=10,K=1.4,weights=(0.75,0.25),save_img=False):
+		"""
+		Plots Dhalf vs. resolution
+		K: Constant in Dhalf = K * res**2 e.g. 2.0
+		weights: tuple, weights of d_min, d_max respectively in d_space = d_min*w_min + d_max*w_max
+		w_min should be greater than w_max as there are more peaks at higher resolutions 
+		"""
+		df_shells = self.ShellIntensities(asci_byframe,N_shells,normalized=True)
+		
+		plt.close('all')
+		fig, ax = plt.subplots()
+		plt.ion()
+
+		# for a given shell define d_space = d_min*w_min + d_max*w_max
+		d_space = df_shells.d_min*weights[0] + df_shells.d_max*weights[1]
+		D_half = df_shells.D_half
+		plt.scatter(d_space,D_half,edgecolors='black',s=150)
+		# fitting line
+		x_min = d_space.iloc[-1] * 0.90
+		x_max = d_space.iloc[0] * 1.1
+		x = np.linspace(x_min, x_max, 100)
+		y = K * x**2
+		ax.plot(x, y, linestyle = '--', color='tab:red', linewidth=2)
+
+		ax.annotate(' $D_{1/2} \propto d^{2}$', xy=(0.74, 0.61), xycoords='axes fraction',\
+			fontsize='xx-large', horizontalalignment='center', verticalalignment='center', color='tab:red')
+
+		ax.set_xscale('log')
+		ax.set_yscale('log')
+		ax.set_xlabel('Resolution ($\mathrm{\\AA}$)',fontsize='x-large')
+		ax.set_ylabel('XDS Half-dose (arbitrary)',fontsize='x-large')
+		ax.tick_params(axis='both', which='both', length=0, labelsize='x-large',pad=10)
+		ax.grid(which='major',linewidth=0.4)
+		ax.grid(which='minor',linewidth=0.2)
+		ax.set_facecolor('0.95')
+		for axis in ['top','bottom','left','right']: ax.spines[axis].set_visible(False)
+		plt.tight_layout()
+		if save_img:
+			fig.savefig(join(self.dir_name,"fig_XDS_DhalfvsRes.png"),dpi=200)
+		plt.show()
+
 """
 if __name__ == "__main__":
-	name_template = '/Users/atakisi/MLFSOM/xds/stills_2.0A_50fr_1deg/stills_2.0A_50fr_1deg_???_001.img'
+	name_template = '/home/thorne20/Desktop/MLFSOM/xds/stills_2.0A_50fr_1deg/stills_2.0A_50fr_1deg_???_001.img'
 	obj = XDSAscii(name_template,96)
 	#asci = obj.ReadAllAscii()
 	#pickle.dump(asci,open('asci.pickle','w'))
-	asci = pickle.load(open('asci.pickle'))
-	shells = obj.PlotShellIntensities(asci)
-	print asci.shape[0]
-	print shells.N_peaks.sum()
-	print shells
-	obj.PlotShellIntensities(asci)
+	#asci = pickle.load(open('asci.pickle'))
+	#shells = obj.PlotShellIntensities(asci)
+	obj.PlotMosCellBfac(save_img=True)
 """
