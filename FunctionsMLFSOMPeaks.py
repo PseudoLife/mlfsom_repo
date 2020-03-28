@@ -122,7 +122,7 @@ def PlotPeakIntensities(df_mlfsomPeaks,first_N_peaks=None,save_img=False):
 	for axis in ['top','bottom','left','right']: ax.spines[axis].set_visible(False)
 	plt.tight_layout()
 	if save_img:
-		fig.savefig("fig_peakIntensities.png",dpi=300)
+		fig.savefig("fig_XYI_PeakIntensities.png",dpi=200)
 	plt.show()
 
 
@@ -159,11 +159,11 @@ def PlotIntegratedIntensities(df_mlfsomPeaks,scale='log',save_img=False):
 	for axis in ['top','bottom','left','right']: ax.spines[axis].set_visible(False)
 	plt.tight_layout()
 	if save_img:
-		fig.savefig("fig_intIntensities.png",dpi=300)
+		fig.savefig("fig_XYI_intIntensities.png",dpi=200)
 	plt.show()	
 
 
-def ShellIntensities(df_mlfsomPeaks,N_shells=10):
+def ShellIntensities(df_mlfsomPeaks,N_shells=10,normalized=False):
 	"""
 	Takes individual peak intensties and number of shells
 	Returns dataframe of shells with int. int., d_min, d_max, n-peaks and D_half in each shell
@@ -197,15 +197,20 @@ def ShellIntensities(df_mlfsomPeaks,N_shells=10):
 		df_shells.loc[shell_index,frame_numbers] = intensities
 		start_index += peaks_x_shell
 
+	if normalized:
+		cols = [col for col in df_shells.columns if type(col)==int]
+		# normalize shell intensities by the first frame
+		for ind in df_shells.index:
+			df_shells.loc[ind,cols] = df_shells.loc[ind,cols]/df_shells.loc[ind,cols[0]]
 	return df_shells
 
 
-def PlotShellIntensities(df_mlfsomPeaks,N_shells=10,save_img=False):
+def PlotShellIntensities(df_mlfsomPeaks,N_shells=10,normalized=True,save_img=False):
 	"""
 	Takes peak intensities and plots peak intensities by shell on log scale
 	Returns dataframe of shells with int. int., d_min, d_max, n-peaks and D_half in each shell
 	"""
-	df_shells = ShellIntensities(df_mlfsomPeaks,N_shells)
+	df_shells = ShellIntensities(df_mlfsomPeaks,N_shells,normalized=normalized)
 	plt.close('all')
 	fig, ax = plt.subplots()
 	plt.ion()
@@ -219,13 +224,12 @@ def PlotShellIntensities(df_mlfsomPeaks,N_shells=10,save_img=False):
 			%(toPrecision(d_max,3),toPrecision(d_min,3),toPrecision(half_dose,3)))
 
 	ax.set_yscale('log')
-	leg = ax.legend(fontsize='xx-small',markerscale=0)
-	leg.set_title('Resolution ($\mathrm{\AA)}$ | $D_{1/2}$',prop={'size':'xx-small'})
+	leg = ax.legend(fontsize='x-small',markerscale=0)
+	leg.set_title('Resolution ($\mathrm{\AA)}$ | $D_{1/2}$',prop={'size':'x-small'})
 	ax.set_xlabel('Frame Number',fontsize='x-large')
 	ax.set_ylabel('MLFSOM Integrated Intensity\n(pixel value)',fontsize='x-large')
 	ax.tick_params(labelsize='large')
 	ax.xaxis.set_minor_locator(AutoMinorLocator())
-	#ax.yaxis.set_minor_locator(AutoMinorLocator())
 	ax.tick_params(axis='both', which='both', length=0)
 	ax.grid(which='major',linewidth=0.4)
 	ax.grid(which='minor',linewidth=0.2)
@@ -233,7 +237,7 @@ def PlotShellIntensities(df_mlfsomPeaks,N_shells=10,save_img=False):
 	for axis in ['top','bottom','left','right']: ax.spines[axis].set_visible(False)
 	plt.tight_layout()
 	if save_img:
-		fig.savefig("fig_shellIntensities.png",dpi=300)
+		fig.savefig("fig_XYI_shellIntensities.png",dpi=200)
 	plt.show()
 	return df_shells
 
