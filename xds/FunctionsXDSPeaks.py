@@ -139,10 +139,39 @@ class XDSAscii:
 				'corr':'corr_'+str(fnumber), 'res':'res_'+str(fnumber)}, inplace=True)
 			asci_byframe = asci_byframe.join(asci, how='outer')
 
-		# Sort columns so that cols go like I_1, xd_1, ..., I_2, xd_2, ...
-		cols = asci_byframe.columns.tolist()
-		cols.sort(key=lambda x: int(x.split('_')[1]))
-		asci_byframe = asci_byframe[cols]
+		# calculate avg peak loc, rlp, partiality etc. over all frames
+		xd_cols = [x for x in asci_byframe.columns if x.startswith('xd_')]
+		asci_byframe['xd'] = asci_byframe[xd_cols].apply(np.mean,axis=1)
+
+		yd_cols = [x for x in asci_byframe.columns if x.startswith('yd_')]
+		asci_byframe['yd'] = asci_byframe[yd_cols].apply(np.mean,axis=1)
+
+		zd_cols = [x for x in asci_byframe.columns if x.startswith('zd_')]
+		asci_byframe['zd'] = asci_byframe[zd_cols].apply(np.mean,axis=1)
+
+		rlp_cols = [x for x in asci_byframe.columns if x.startswith('rlp_')]
+		asci_byframe['rlp'] = asci_byframe[rlp_cols].apply(np.mean,axis=1)
+
+		peak_cols = [x for x in asci_byframe.columns if x.startswith('peak_')]
+		asci_byframe['peak'] = asci_byframe[peak_cols].apply(np.mean,axis=1)
+
+		corr_cols = [x for x in asci_byframe.columns if x.startswith('corr_')]
+		asci_byframe['corr'] = asci_byframe[corr_cols].apply(np.mean,axis=1)
+
+		res_cols = [x for x in asci_byframe.columns if x.startswith('res_')]
+		asci_byframe['res'] = asci_byframe[res_cols].apply(np.mean,axis=1)
+
+		# Drop peak loc, rlp etc. by frame, keep only avg values calculated above
+		drop_cols = [x for x in asci_byframe.columns if x.startswith('xd_') or \
+		x.startswith('yd_') or x.startswith('zd_') or x.startswith('rlp_') or \
+		x.startswith('peak_') or x.startswith('corr_') or x.startswith('res_')]
+		asci_byframe.drop(columns=drop_cols,inplace=True)
+
+		# Sort cols so that I_1, I_2, ..., xd, yd, zd, ... 
+		cols_I = [x for x in asci_byframe.columns if x.startswith('I_')]
+		cols_I.sort( key=lambda x: int(x.split('_')[1]) )
+		cols_others = [x for x in asci_byframe.columns if not x.startswith('I_')]
+		asci_byframe = asci_byframe[cols_I + cols_others]
 
 		os.chdir(cwd)
 		return asci_byframe
@@ -210,7 +239,6 @@ class XDSAscii:
 			input_bfactor = np.linspace(start_bfactor,start_bfactor+k_bfactor*(frames-1),frames)
 			axs[0,1].plot(np.arange(frames),input_bfactor,label='MLFSOM input',color='black',linewidth=3)
 		
-
 		start_cellA, start_cellB, start_cellC = [ float(x) for x in self.unit_cell[0:3] ]
 		k_cell = float(self.description.loc['k_cell','value'])
 		# Cell-A
@@ -479,13 +507,12 @@ class XDSAscii:
 			fig.savefig(join(self.dir_name,"fig_XDS_DhalfvsRes.png"),dpi=200)
 		plt.show()
 
-"""
+
 if __name__ == "__main__":
 	name_template = '/home/thorne20/Desktop/MLFSOM/xds/stills_2.0A_50fr_1deg/stills_2.0A_50fr_1deg_???_001.img'
 	obj = XDSAscii(name_template,96)
-	#asci = obj.ReadAllAscii()
+	asci = obj.ReadAllAscii()
 	#pickle.dump(asci,open('asci.pickle','w'))
 	#asci = pickle.load(open('asci.pickle'))
 	#shells = obj.PlotShellIntensities(asci)
-	obj.PlotMosCellBfac(save_img=True)
-"""
+	#obj.PlotMosCellBfac(save_img=True)
