@@ -31,10 +31,9 @@ def ReadSingleXDSAscii(in_ascii):
 			break
 	unit_cell = tuple([float(x) for x in unit_cell])
 	
-	# calculate resolution and create a new 'res' column	
-	for ind in asci.index:
-		hkl = tuple(asci.loc[ind,['h','k','l']])
-		asci.loc[ind,'res'] = CalcResolution(unit_cell,hkl)
+	# calculate resolution and create a new 'res' column
+	hkl_series = asci.apply(lambda x: (x.h, x.k, x.l), axis=1)
+	asci['res'] = hkl_series.apply(lambda x: CalcResolution(unit_cell,x))
 	return asci
 
 
@@ -61,8 +60,9 @@ class XDSAscii:
 					for line in myfile:
 						if 'CRYST1' in line:
 							unit_cell = tuple(line.split()[1:7])
-							self.unit_cell = unit_cell
+							self.unit_cell = tuple([float(x) for x in unit_cell])
 							break
+
 
 	def ReindexImages(self):
 		"""
@@ -174,6 +174,7 @@ class XDSAscii:
 		asci_byframe = asci_byframe[cols_I + cols_others]
 
 		os.chdir(cwd)
+		self.peaks = asci_byframe
 		return asci_byframe
 
 
@@ -202,6 +203,7 @@ class XDSAscii:
 		
 		results_byframe.sort_index(inplace=True)
 		os.chdir(cwd)
+		self.mcb = results_byframe
 		return results_byframe
 
 
@@ -239,7 +241,7 @@ class XDSAscii:
 			input_bfactor = np.linspace(start_bfactor,start_bfactor+k_bfactor*(frames-1),frames)
 			axs[0,1].plot(np.arange(frames),input_bfactor,label='MLFSOM input',color='black',linewidth=3)
 		
-		start_cellA, start_cellB, start_cellC = [ float(x) for x in self.unit_cell[0:3] ]
+		start_cellA, start_cellB, start_cellC = self.unit_cell[0:3]
 		k_cell = float(self.description.loc['k_cell','value'])
 		# Cell-A
 		axs[1,0].scatter(mcb.index,mcb.cellA,label='XDS refined',facecolor='tab:green',s=30)
@@ -276,6 +278,8 @@ class XDSAscii:
 		if save_img:
 			fig.savefig( join(self.dir_name,"fig_XDS_MosCellBfac.png"), dpi=300 )
 		plt.show()
+		self.mcb = mcb
+		return mcb
 
 
 	def PlotPeakIntensities(self,asci_byframe,first_N_peaks=None,save_img=False):
@@ -409,7 +413,7 @@ class XDSAscii:
 			intensities = df_peaks.iloc[start_index:end_index][cols].apply(np.nansum)
 
 			# calculate half_dose by fitting exponential to dose curves
-			intensities[intensities<0] = 0.1  # replace negative values with 0.1 to avoid numerical problems 
+			intensities[intensities<=0] = 0.1  # replace negative values with 0.1 to avoid numerical problems 
 			fit_c1, fit_c2 = np.polyfit(frame_numbers, np.log(intensities.to_list()), 1)
 			half_dose = round(-np.log(2)/fit_c1,2)
 
@@ -422,6 +426,7 @@ class XDSAscii:
 			for ind in df_shells.index:
 				df_shells.loc[ind,cols[0]::] = df_shells.loc[ind,cols[0]::]/df_shells.loc[ind,cols[0]]
 
+		self.shells = df_shells
 		return df_shells
 
 
@@ -463,6 +468,7 @@ class XDSAscii:
 		if save_img:
 			fig.savefig(join(self.dir_name,"fig_XDS_shellintensities.png"),dpi=200)
 		plt.show()
+		self.shells = df_shells
 		return df_shells
 
 
@@ -511,8 +517,8 @@ class XDSAscii:
 if __name__ == "__main__":
 	name_template = '/home/thorne20/Desktop/MLFSOM/xds/stills_2.0A_50fr_1deg/stills_2.0A_50fr_1deg_???_001.img'
 	obj = XDSAscii(name_template,96)
-	asci = obj.ReadAllAscii()
+	obj.ReadAllAscii()
 	#pickle.dump(asci,open('asci.pickle','w'))
 	#asci = pickle.load(open('asci.pickle'))
-	#shells = obj.PlotShellIntensities(asci)
+	#shells = obj.PlotShellIntensities(obj.peaks)
 	#obj.PlotMosCellBfac(save_img=True)
