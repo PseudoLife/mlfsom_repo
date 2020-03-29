@@ -157,14 +157,16 @@ def RunExperiments(pdb_file,prefix,experiment_list,resolution,solvent_B,threads)
             subprocess.call(['./ano_sfall.com', \
                 'input'+str(ID)+'.pdb', 'resolution='+str(resolution), 'solvent_B='+str(solvent_B)])
             subprocess.call(['mv', 'ideal_ano.mtz', 'input'+str(ID)+'.mtz'])
-        p.map(RunExperiment,experiments_and_prefix[i:i+threads])
-        
-        # clear temp files and move results
-        print('Clearing temp files and moving results\n')
-        os.system('mv ' + join(tmp_path,'mlfsom*.XYI ') + output_folder)    
-        os.system('mv '+ join(tmp_path,'mlfsom*predin.txt ') + output_folder)        
-        os.system('rm '+ join(mlfsom_path,'fit2d_*'))
-        os.system('rm ' + join(tmp_path,'*'))
+    p.map(RunExperiment,experiments_and_prefix)
+    p.close()
+    p.join()
+    
+    # clear temp files and move results
+    print('Clearing temp files and moving results\n')
+    os.system('mv ' + join(tmp_path,'mlfsom*.XYI ') + output_folder)    
+    os.system('mv '+ join(tmp_path,'mlfsom*predin.txt ') + output_folder)        
+    os.system('rm '+ join(mlfsom_path,'fit2d_*'))
+    os.system('rm ' + join(tmp_path,'*'))
 
     time_final = time.time()
     print 'TOTAL TIME ELAPSED: %i min' %int((time_final-time_initial)/60)
