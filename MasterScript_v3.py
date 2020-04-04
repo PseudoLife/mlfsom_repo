@@ -107,11 +107,11 @@ def GetHomogenousExperimentList(stills, start_mos, k_mos, k_cell, k_bfactor, fra
     beam_size = 100
     for frame in range(0,frames):
         dose = frame
-        ID = len(experiment_list)
+        ID = len(experiment_list) + 1    # ID of the first exp is set to 1
         if stills == True:
-            phi = 342.0   # default starting angle of mlfsom
+            phi = 252.0   # default starting angle of mlfsom 342 #########################################################
         else:
-            phi = 342.0 + frame*osc
+            phi = 252.0 + frame*osc
         experiment_list.append(\
             (ID, round(start_mos+k_mos*dose,3), round(k_bfactor*dose,2),\
              round(k_cell*dose,4), osc, round(phi,2), round(distance,3), "%.2e" %flux, xtal_size, beam_size))
@@ -141,7 +141,7 @@ def RunExperiments(pdb_file,prefix,experiment_list,resolution,solvent_B,threads)
     os.system('rm ' + join(tmp_path,'*')) # clear previous temp files
     
     # set up threading and run exps
-    p = mp.Pool(threads)
+    pool = mp.Pool(threads)
     experiments_and_prefix = list(zip(experiment_list,[prefix]*len(experiment_list)))
     output_folder = join(mlfsom_path,'data_'+prefix)
     os.system('mkdir --parents ' + output_folder)  # create sub-fol to save output files
@@ -151,15 +151,24 @@ def RunExperiments(pdb_file,prefix,experiment_list,resolution,solvent_B,threads)
             ID = exp[0][0]
             bfactor_inc = exp[0][2]
             cell_inc = exp[0][3]
-            print("Generating inputs for ID="+str(ID))
+            print("\nGenerating inputs for ID="+str(ID))
+            
+            # Generate inputID.pdb for each exp using temp.pdb which is just the copy of original input pdb
             subprocess.call(['./change_pdb_param.com', 'temp.pdb', 'input'+str(ID)+'.pdb', \
-                'add_cell='+str(cell_inc), 'add_bfactor='+str(bfactor_inc)])           
+                'add_cell='+str(cell_inc), 'add_bfactor='+str(bfactor_inc)])         
+            
+            # Generate inputID.mtz from inputID.pdb by adding solvent contribution  
             subprocess.call(['./ano_sfall.com', \
                 'input'+str(ID)+'.pdb', 'resolution='+str(resolution), 'solvent_B='+str(solvent_B)])
             subprocess.call(['mv', 'ideal_ano.mtz', 'input'+str(ID)+'.mtz'])
-    p.map(RunExperiment,experiments_and_prefix)
-    p.close()
-    p.join()
+        
+        #pool = mp.Pool(threads)  
+        #pool.map(RunExperiment,experiments_and_prefix[i:i+threads])
+        #pool.close()
+        #pool.join()
+    pool.map(RunExperiment,experiments_and_prefix)
+    pool.close()
+    pool.join()
     
     # clear temp files and move results
     print('Clearing temp files and moving results\n')
@@ -188,15 +197,20 @@ def RunExperiment(experiment_and_prefix):
     ID,mos,bfactor_inc,cell_inc,osc,phi,distance,sub_flux,sub_xtal_size,sub_beam_size = experiment
     output_folder = join(mlfsom_path,'data_'+prefix)
     os.system('mkdir --parents ' + output_folder)  # create sub-fol to save output files
-    # IS THE PRINT COMMAND BELOW REALLY NECESSARY???
-    print ( ' '.join(['\n------ RUNNING ID='+str(ID), 'mos='+str(mos), 'bfactor_inc='+str(bfactor_inc),\
-        'cell_inc='+str(cell_inc), 'osc='+str(osc), 'phi='+str(phi), 'distance='+str(distance), 
-        'sub_flux='+str(sub_flux), 'sub_xtal_size='+str(sub_xtal_size), 'sub_beam_size='+str(sub_beam_size), '\n']) )
+    print('------------------ RUNNING ID: '+str(ID)+' ------------------')
     subprocess.call([\
-        './mlfsom.com', join(output_folder,prefix+'_'+str(ID)+'_001.img'), 'input'+str(ID)+'.mtz',\
-        'frames=1', 'id='+str(ID), 'mosaic='+str(mos), 'osc='+str(osc), 'phi='+str(phi), \
-        'distance='+str(distance), 'flux='+str(sub_flux), \
-        'xtal_size='+str(sub_xtal_size), 'beam_size='+str(sub_beam_size)])
+        './mlfsom.com', \
+        join(output_folder,prefix+'_'+str(ID)+'_001.img'), \
+        'input'+str(ID)+'.mtz',\
+        'frames=1', \
+        'id='+str(ID), \
+        'mosaic='+str(mos), \
+        'osc='+str(osc), \
+        'phi='+str(phi), \
+        'distance='+str(distance), \
+        'flux='+str(sub_flux), \
+        'xtal_size='+str(sub_xtal_size), \
+        'beam_size='+str(sub_beam_size)])
     print('------------------ ID: '+str(ID)+' DONE ------------------')
 
 
