@@ -17,7 +17,7 @@ def ReadSingleXDSAscii(in_ascii):
 	FUTURE: Generalize res calc (works for cubic, tetragonal, orthorhombic) to other space groups  
 	"""
 	asci = pd.read_csv(in_ascii,header=None, sep='\s+', engine='python', \
-	names=['h','k','l','Iasci','sigIasci','xd','yd','zd','rlp','peak','corr','psi'],\
+	names=['h','k','l','Iasci','sigIasci','xd','yd','zd','rlp','peak','cor','psi'],\
 	skiprows=47,skipfooter=1)
 	asci['hkl'] = asci.h.apply(lambda x:str(x)) + ' ' + asci.k.apply(lambda x:str(x)) +\
  	' ' + asci.l.apply(lambda x:str(x))
@@ -94,8 +94,12 @@ class XDSAscii:
 		"""
 		cwd = os.getcwd()
 		os.chdir(self.dir_name)
-
+		
+		os.system('rm ' + join(self.dir_name,'XDS_ASCII_*.HKL')) # clear previous results if any
+		os.system('rm ' + join(self.dir_name,'CORRECT_*.LP'))
+		
 		img_list = glob(self.base_name.replace('???','*'))
+		img_list.sort()
 		for img in img_list:
 			fnumber = img.split(self.base_name.split('???')[0])[1][0:3]
 			
@@ -147,7 +151,7 @@ class XDSAscii:
 			asci.drop(columns=['h','k','l','sigIasci','psi'],inplace=True)
 			asci.rename(columns={'Iasci':'I_'+str(fnumber), 'xd':'xd_'+str(fnumber), 'yd':'yd_'+str(fnumber),\
 				'zd':'zd_'+str(fnumber), 'rlp':'rlp_'+str(fnumber), 'peak':'peak_'+str(fnumber), \
-				'corr':'corr_'+str(fnumber), 'res':'res_'+str(fnumber)}, inplace=True)
+				'cor':'cor_'+str(fnumber), 'res':'res_'+str(fnumber)}, inplace=True)
 			asci_byframe = asci_byframe.join(asci, how='outer')
 
 		# calculate avg peak loc, rlp, partiality etc. over all frames
@@ -166,8 +170,8 @@ class XDSAscii:
 		peak_cols = [x for x in asci_byframe.columns if x.startswith('peak_')]
 		asci_byframe['peak'] = asci_byframe[peak_cols].apply(np.mean,axis=1)
 
-		corr_cols = [x for x in asci_byframe.columns if x.startswith('corr_')]
-		asci_byframe['corr'] = asci_byframe[corr_cols].apply(np.mean,axis=1)
+		cor_cols = [x for x in asci_byframe.columns if x.startswith('cor_')]
+		asci_byframe['cor'] = asci_byframe[cor_cols].apply(np.mean,axis=1)
 
 		res_cols = [x for x in asci_byframe.columns if x.startswith('res_')]
 		asci_byframe['res'] = asci_byframe[res_cols].apply(np.mean,axis=1)
@@ -175,7 +179,7 @@ class XDSAscii:
 		# Drop peak loc, rlp etc. by frame, keep only avg values calculated above
 		drop_cols = [x for x in asci_byframe.columns if x.startswith('xd_') or \
 		x.startswith('yd_') or x.startswith('zd_') or x.startswith('rlp_') or \
-		x.startswith('peak_') or x.startswith('corr_') or x.startswith('res_')]
+		x.startswith('peak_') or x.startswith('cor_') or x.startswith('res_')]
 		asci_byframe.drop(columns=drop_cols,inplace=True)
 
 		# Sort cols so that I_1, I_2, ..., xd, yd, zd, ... 
@@ -290,7 +294,7 @@ class XDSAscii:
 
 		plt.tight_layout()
 		if save_img:
-			fig.savefig( join(self.dir_name,"fig_XDS_MosCellBfac.png"), dpi=300 )
+			fig.savefig( join(self.dir_name,"fig_XDS_MosCellBfac.png"), dpi=200 )
 		plt.show()
 		self.mcb = mcb
 		return mcb
