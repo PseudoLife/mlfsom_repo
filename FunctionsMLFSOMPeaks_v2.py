@@ -49,7 +49,7 @@ class mlfsomXYI:
 			# read unit cell params from the original pdb file if exists
 			pdb_file = join(self.dir_name,self.description.loc['pdb_file','value'])
 			if not os.path.isfile(pdb_file):
-				print "MyError: Please place the original pdb file (%s) in the folder!" %pdb_file
+				print "MyError: Please place the original pdb file in the folder!"
 			else:
 				with open(pdb_file) as myfile:
 					for line in myfile:
