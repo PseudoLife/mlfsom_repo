@@ -1,15 +1,18 @@
-experiment: homo_mosOff
+pdb_file: 1H87.pdb
+prefix: homo_mosOff
+stills: True
 N_grid: None
+frames: 10
 start mos: 0.15
 k_mos: 0
 k_cell: 0.001
 k_bfactor: 4
-frames: 10
 resolution: 1.5
 solvent_B: 35
 osc: 0.01
-exposure: 0.5
-crystal_size: 77.8
+distance: 250.4
+flux: 8.40e+10
+xtal_size: 77.8
 beam_fwhm_x: 100
 beam_fwhm_y: 100
 threads: 4

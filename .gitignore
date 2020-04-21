@@ -3,6 +3,7 @@
 *.adxv_beam_center
 
 data_*
+toRUN.py
 
 absolute_scale.map
 ano_sfall_debug.log

@@ -22,6 +22,11 @@ df.isna()
 # total number of nan's in a series
 df['my_column'].isna().sum()
 
+img_list = [x for x in os.listdir('.') if x.endswith('.img')]
+var_loc = 6
+for img in img_list:
+	new_name = '_'.join(img.split('_')[0:var_loc] + [('00'+str(int(img.split('_')[var_loc])+1))[-3::]] + img.split('_')[var_loc+1::])
+    os.rename(img,new_name)
 
 
 #df = pd.read_csv('mlfsom_tempfile0_preds_1.XYI',sep=' ',header=None)
