@@ -133,6 +133,7 @@ class XDSAscii:
 			subprocess.call(['xds'])
 			subprocess.call(['mv', 'XDS_ASCII.HKL', 'XDS_ASCII_%s.HKL' %fnumber])
 			subprocess.call(['mv', 'CORRECT.LP', 'CORRECT_%s.LP' %fnumber])
+		self.peaks = None
 		os.chdir(cwd)
 
 
@@ -243,7 +244,7 @@ class XDSAscii:
 		start_mos = float(self.description.loc['start_mos','value'])
 		k_mos = float(self.description.loc['k_mos','value'])
 		input_mos = np.linspace(start_mos,start_mos+k_mos*(frames-1),frames)
-		axs[0,0].plot(np.arange(frames),input_mos,label='MLFSOM input',color='black',linewidth=2)
+		axs[0,0].plot(np.arange(1,frames+1),input_mos,label='MLFSOM input',color='black',linewidth=2)
 
 		# B-factor
 		axs[0,1].scatter(mcb.index,mcb.wilsonB,label='XDS refined',facecolor='tab:orange',s=30)
@@ -254,10 +255,10 @@ class XDSAscii:
 				if 'MEAN B VALUE' in line:
 					start_bfactor = line.split()[-1]
 					break
-		if start_bfactor != 'NULL':
+		if 'start_bfactor' in locals() and start_bfactor != 'NULL':
 			start_bfactor = float(start_bfactor)
 			input_bfactor = np.linspace(start_bfactor,start_bfactor+k_bfactor*(frames-1),frames)
-			axs[0,1].plot(np.arange(frames),input_bfactor,label='MLFSOM input',color='black',linewidth=2)
+			axs[0,1].plot(np.arange(1,frames+1),input_bfactor,label='MLFSOM input',color='black',linewidth=2)
 		
 		start_cellA, start_cellB, start_cellC = self.unit_cell[0:3]
 		k_cell = float(self.description.loc['k_cell','value'])
@@ -265,19 +266,19 @@ class XDSAscii:
 		axs[1,0].scatter(mcb.index,mcb.cellA,label='XDS refined',facecolor='tab:green',s=30)
 		axs[1,0].set_ylabel('Cell-A')
 		input_cellA = np.linspace(start_cellA, start_cellA+start_cellA*k_cell*(frames-1),frames)
-		axs[1,0].plot(np.arange(frames),input_cellA,label='MLFSOM input',color='black',linewidth=2)
+		axs[1,0].plot(np.arange(1,frames+1),input_cellA,label='MLFSOM input',color='black',linewidth=2)
 
 		# Cell-B
 		axs[1,1].scatter(mcb.index,mcb.cellB,label='XDS refined',facecolor='tab:red',s=30)
 		axs[1,1].set_ylabel('Cell-B')
 		input_cellB = np.linspace(start_cellB, start_cellB+start_cellB*k_cell*(frames-1),frames)
-		axs[1,1].plot(np.arange(frames),input_cellB,label='MLFSOM input',color='black',linewidth=2)
+		axs[1,1].plot(np.arange(1,frames+1),input_cellB,label='MLFSOM input',color='black',linewidth=2)
 
 		# Cell-C
 		axs[1,2].scatter(mcb.index,mcb.cellC,label='XDS refined',facecolor='tab:purple',s=30)
 		axs[1,2].set_ylabel('Cell-C')
 		input_cellC = np.linspace(start_cellC, start_cellC+start_cellC*k_cell*(frames-1),frames)
-		axs[1,2].plot(np.arange(frames),input_cellC,label='MLFSOM input',color='black',linewidth=2)
+		axs[1,2].plot(np.arange(1,frames+1),input_cellC,label='MLFSOM input',color='black',linewidth=2)
 
 		# General figure settings applied to every subplot
 		for row in range(2):
@@ -409,6 +410,7 @@ class XDSAscii:
 		peaks_per_shell = int( len(df_peaks)/float(N_shells) )
 		peaks_each_shell = np.ones(N_shells).astype(int) * peaks_per_shell
 		
+
 		# get the relevant intensity columns
 		int_cols = [x for x in df_peaks.columns if x.startswith('I_')]
 		int_cols.sort(key=lambda x: int(x.split('_')[1]))
@@ -428,7 +430,7 @@ class XDSAscii:
 			intensities = df_peaks.iloc[start_index:end_index][int_cols].apply(np.nansum)
 
 			# calculate half_dose by fitting exponential to dose curves
-			intensities[intensities<=0] = 0.1  # replace negative values with 0.1 to avoid numerical problems 
+			intensities[intensities<=0] = 0.1  # replace negative values with 0.1 to avoid numerical problems
 			fit_c1, fit_c2 = np.polyfit(frame_numbers, np.log(intensities.to_list()), 1)
 			half_dose = round(-np.log(2)/fit_c1,2)
 
@@ -480,6 +482,9 @@ class XDSAscii:
 		ax.set_facecolor('0.95')
 		for axis in ['top','bottom','left','right']: ax.spines[axis].set_visible(False)
 		plt.tight_layout()
+		if normalized:
+			ymin = max(10**-3,df_shells[cols].min().min())
+			ax.set_ylim(ymin=ymin)  # don't show noise caused by NaN intensities (reassigned to 0.1) 
 		if save_img:
 			fig.savefig(join(self.dir_name,"fig_XDS_Shellintensities.png"),dpi=200)
 		plt.show()
@@ -487,7 +492,7 @@ class XDSAscii:
 		return df_shells
 
 
-	def PlotDhalfvsResolution(self,asci_byframe,N_shells=10,K=1.4,weights=(0.75,0.25),save_img=True):
+	def PlotDhalfvsResolution(self,asci_byframe,N_shells=10,K=0.2,weights=(0.75,0.25),save_img=True):
 		"""
 		Plots Dhalf vs. resolution
 		K: Constant in Dhalf = K * res**2 e.g. 2.0
@@ -527,13 +532,24 @@ class XDSAscii:
 		if save_img:
 			fig.savefig(join(self.dir_name,"fig_XDS_DhalfvsRes.png"),dpi=200)
 		plt.show()
+		return df_shells
 
 """
 if __name__ == "__main__":
-	name_template = '/home/thorne20/Desktop/MLFSOM/data_trial/trial_???_001.img'
-	xob = XDSAscii(name_template,96)
+	name_template = '/home/thorne20/Desktop/MLFSOM/data_stills_6K8S_2.0A_10fr_1deg_350mm_ang252/stills_6K8S_2.0A_10fr_1deg_350mm_ang252_???_001.img'
+	xob = XDSAscii(name_template,19)
 	xob.ReadAllAscii()
-	print xob.ShellIntensities(xob.peaks,5)
+	
+	df = xob.peaks.copy()
+	int_cols = [x for x in df.columns if x.startswith('I_')]
+	df[df[int_cols]<0] = 0
+	
+	df = df[(df.I_1.notna()) & (df.I_10.notna())]
+
+	df = df[df.peak>85]
+
+	print xob.PlotShellIntensities(df,N_shells=10)
+	#xob.PlotShellIntensities(xob.peaks,N_shells=20)
 	#pickle.dump(asci,open('asci.pickle','w'))
 	#asci = pickle.load(open('asci.pickle'))
 	#shells = obj.PlotShellIntensities(obj.peaks)
