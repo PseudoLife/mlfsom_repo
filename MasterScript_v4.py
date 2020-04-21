@@ -82,7 +82,7 @@ def GetExperimentList(N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, \
     return (frame_weights,experiment_list)
 
 
-def GetHomogenousExperimentList(stills, start_mos, k_mos, k_cell, k_bfactor, frames, osc, distance, flux):
+def GetHomogenousExperimentList(stills, start_mos, k_mos, k_cell, k_bfactor, frames, phi_start, osc, distance, flux):
     """
     Used by fn: HomogenousCrystal
     Returns a queue of params of exps for mlfsom to calc dose dependent diff.
@@ -109,9 +109,9 @@ def GetHomogenousExperimentList(stills, start_mos, k_mos, k_cell, k_bfactor, fra
         dose = frame
         ID = len(experiment_list) + 1    # ID of the first exp is set to 1
         if stills == True:
-            phi = 342.0   # default starting angle of mlfsom 342 #########################################################
+            phi = phi_start
         else:
-            phi = 342.0 + frame*osc
+            phi = phi_start + frame*osc
         experiment_list.append(\
             (ID, round(start_mos+k_mos*dose,3), round(k_bfactor*dose,2),\
              round(k_cell*dose,4), osc, round(phi,2), round(distance,3), "%.2e" %flux, xtal_size, beam_size))
@@ -280,7 +280,7 @@ def SpacialDependentCrystal(prefix,N_grid,start_mos,k_mos,k_cell,k_bfactor,\
 
 
 def HomogenousCrystal(pdb_file,prefix,stills,start_mos,k_mos,k_cell,k_bfactor,frames,\
-    resolution=2.5,solvent_B=35,osc=.01,distance=250,flux=8.4e10,threads=4):
+    resolution=2.5,solvent_B=35,phi_start=342,osc=.01,distance=250,flux=8.4e10,threads=4):
     """
     Generates files defining the params of exps for mlfsom to calc
     dose dep. diff. patterns for a homogenous xtl given by:
@@ -313,10 +313,10 @@ def HomogenousCrystal(pdb_file,prefix,stills,start_mos,k_mos,k_cell,k_bfactor,fr
     beam_fwhm_y = 100
     frame_weights = []
     experiment_list = GetHomogenousExperimentList(\
-        stills, start_mos, k_mos, k_cell, k_bfactor, frames, osc, distance, flux)
+        stills, start_mos, k_mos, k_cell, k_bfactor, frames, phi_start, osc, distance, flux)
     RunExperiments(pdb_file,prefix,experiment_list,resolution,solvent_B,threads)
     WriteDescription(pdb_file, prefix, stills, N_grid, start_mos, k_mos, \
-        k_cell, k_bfactor, frames, resolution, solvent_B, osc, distance, flux, \
+        k_cell, k_bfactor, frames, resolution, solvent_B, phi_start, osc, distance, flux, \
         xtal_size, beam_fwhm_x, beam_fwhm_y, threads, frame_weights)
     WriteExpQueueAndList(prefix,experiment_list)
     return experiment_list
@@ -342,7 +342,7 @@ def WriteExpQueueAndList(prefix,experiment_list):
 
 def WriteDescription(\
     pdb_file, prefix, stills, N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, resolution, \
-    solvent_B, osc, distance, flux, xtal_size, beam_fwhm_x, beam_fwhm_y, threads, frame_weights):
+    solvent_B, phi_start, osc, distance, flux, xtal_size, beam_fwhm_x, beam_fwhm_y, threads, frame_weights):
     """
     Used by fn: HomogenousCrystal, SpacialDependentCrystal
     Writes exp. params to a file e.g. exp-prefix-desc.txt
@@ -360,6 +360,7 @@ def WriteDescription(\
     f.write("k_bfactor: "+str(k_bfactor)+"\n")
     f.write("resolution: "+str(resolution)+"\n")
     f.write("solvent_B: "+str(solvent_B)+"\n")
+    f.write("phi_start: "+str(phi_start)+"\n")
     f.write("osc: "+str(osc)+"\n")
     f.write("distance: "+str(distance)+"\n")
     f.write("flux: "+"%.2e" %flux + "\n")
