@@ -275,13 +275,13 @@ class mlfsomXYI:
 		for axis in ['top','bottom','left','right']: ax.spines[axis].set_visible(False)
 		plt.tight_layout()
 		if save_img:
-			fig.savefig(join(self.dir_name,"fig_XYI_ShellIntensities.png"),dpi=200)
+			fig.savefig(join(self.dir_name,"fig_XYI_Shellintensities.png"),dpi=200)
 		plt.show()
 		self.shells = df_shells
 		return df_shells
 
 
-	def PlotDhalfvsResolution(self,df_peaks,N_shells=10,K=1.4,weights=(0.75,0.25),save_img=True):
+	def PlotDhalfvsResolution(self,df_peaks,N_shells=10,K=0.2,weights=(0.75,0.25),save_img=True):
 		"""
 		Plots Dhalf vs. resolution
 		K: Constant in Dhalf = K * res**2 e.g. 2.0
@@ -321,6 +321,7 @@ class mlfsomXYI:
 		if save_img:
 			fig.savefig(join(self.dir_name,"fig_XYI_DhalfvsRes.png"),dpi=200)
 		plt.show()
+		return df_shells
 
 
 def AggregateCustomFramesPeakIntensities(dir_name,start_frame_id,end_frame_id):
@@ -446,10 +447,14 @@ def ReadGaussianPeakIntensities(dir_name):
 
 """
 if __name__ == "__main__":
-	dir_name = '/home/thorne20/Desktop/MLFSOM/data_stills_2.0A_50fr_1deg'
+	#dir_name = '/home/thorne20/Desktop/MLFSOM/data_pdb_1LR3_10fr'
+	pdb = '3ALD'
+	dir_name = '/home/thorne20/Desktop/MLFSOM/data_pdb_%s' %pdb
 	mobj = mlfsomXYI(dir_name)
 	mobj.ReadPeakIntensities()
-	#mobj.PlotIntegratedIntensities(mobj.peaks,save_img=True)
-	#mobj.PlotShellIntensities(mobj.peaks,save_img=True)
-	mobj.PlotDhalfvsResolution(mobj.peaks,N_shells=10,K=1.2,weights=(0.75,0.25),save_img=False)
+	mobj.PlotPeakIntensities(mobj.peaks,100)
+	mobj.PlotIntegratedIntensities(mobj.peaks)
+	mobj.PlotShellIntensities(mobj.peaks)
+	print mobj.peaks.shape
+	#mobj.PlotDhalfvsResolution(mobj.peaks,N_shells=10,K=1.2,weights=(0.75,0.25),save_img=False)
 """
