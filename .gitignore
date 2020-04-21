@@ -2,6 +2,8 @@
 *.pyc
 *.adxv_beam_center
 
+data_*
+
 absolute_scale.map
 ano_sfall_debug.log
 pristine.mtz
