@@ -49,7 +49,7 @@ set shutter_jitter = 0.5ms
 
 
 # camera parameters
-set distance    = 250.432mm
+set distance    = 250.432mm     # default 250.432mm
 set twotheta    = 0deg
 set beam_center = ( 211.8 217.3 )
 set phi0        = 342deg
