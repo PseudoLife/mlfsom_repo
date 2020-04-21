@@ -1,5 +1,0 @@
-
-gnuplot> set terminal table
-                      ^
-         line 0: unknown or ambiguous terminal type; type just 'set terminal' for a list
-
