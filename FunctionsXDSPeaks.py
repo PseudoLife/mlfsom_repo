@@ -388,28 +388,21 @@ class XDSAscii:
 		plt.show()
 
 
-	def ShellIntensities(self,asci_byframe,N_shells=10,normalized=False):
+	def ShellIntensities(self,asci_byframe,N_shells=10,npeak_ratio=1,normalized=False):
 		"""
 		Takes individual peak intensties and number of shells
 		Returns dataframe of shells with int. int., d_min, d_max, n-peaks and D_half in each shell
-		FUTURE: 1-more peaks in low res shells 2-normalized int
+		npeak_ratio: int, ratio of the N of peaks in highest to lowest res. shell
+		npeak_ratio = 1 for equal number of peaks per shell
 		"""
 		df_peaks = asci_byframe.copy()
 		df_peaks.sort_values('res',ascending=False,inplace=True)
 
-		'''
-		### SWITCH - unequal number of peaks ###########################
-		npeak_ratio = 5    # ratio of the N of peaks in highest to lowest res. shell
 		print 'npeak_ratio: %i' %npeak_ratio
 		alpha = np.log(npeak_ratio)/N_shells  
 		x = np.arange(N_shells)
 		peaks_each_shell = np.exp(alpha*x)/sum(np.exp(alpha*x)) * len(df_peaks)
-		peaks_each_shell = peaks_each_shell.astype(int) 
-		'''
-		### SWITCH - equal number of peaks ############################
-		peaks_per_shell = int( len(df_peaks)/float(N_shells) )
-		peaks_each_shell = np.ones(N_shells).astype(int) * peaks_per_shell
-		
+		peaks_each_shell = peaks_each_shell.astype(int)
 
 		# get the relevant intensity columns
 		int_cols = [x for x in df_peaks.columns if x.startswith('I_')]
@@ -447,12 +440,14 @@ class XDSAscii:
 		return df_shells
 
 
-	def PlotShellIntensities(self,asci_byframe,N_shells=10,normalized=True,save_img=True):
+	def PlotShellIntensities(self,asci_byframe,N_shells=10,npeak_ratio=1,normalized=True,save_img=True):
 		"""
 		Takes peak intensities and plots peak intensities by shell on log scale
 		Returns dataframe of shells with int. int., d_min, d_max, n-peaks and D_half in each shell
+		npeak_ratio: int, ratio of the N of peaks in highest to lowest res. shell
+		npeak_ratio = 1 for equal number of peaks per shell
 		"""
-		df_shells = self.ShellIntensities(asci_byframe,N_shells,normalized=normalized)
+		df_shells = self.ShellIntensities(asci_byframe,N_shells,npeak_ratio,normalized=normalized)
 		plt.close('all')
 		fig, ax = plt.subplots()
 		plt.ion()
@@ -466,11 +461,15 @@ class XDSAscii:
 			d_min,d_max,half_dose = df_shells.loc[shell_index,['d_min','d_max','D_half']]
 			intensities = df_shells.loc[shell_index,cols]
 
-			ax.plot(frame_numbers,intensities,marker='o',lw=2,label='%s - %s | %s' \
+			#ax.plot(frame_numbers,intensities,marker='o',lw=2,label='%s - %s | %s' \
+			#	%(toPrecision(d_max,3),toPrecision(d_min,3),toPrecision(half_dose,3)))
+
+			ax.scatter(frame_numbers,intensities,label='%s - %s | %s' \
 				%(toPrecision(d_max,3),toPrecision(d_min,3),toPrecision(half_dose,3)))
 
 		ax.set_yscale('log')
-		leg = ax.legend(fontsize='x-small',markerscale=0)
+		#leg = ax.legend(fontsize='x-small',markerscale=0)
+		leg = ax.legend(fontsize='x-small')
 		leg.set_title('Resolution ($\mathrm{\AA)}$ | $D_{1/2}$',prop={'size':'x-small'})
 		ax.set_xlabel('Frame Number',fontsize='x-large')
 		ax.set_ylabel('XDS Integrated Intensity \n(indexed-corrected)',fontsize='x-large')
@@ -483,7 +482,7 @@ class XDSAscii:
 		for axis in ['top','bottom','left','right']: ax.spines[axis].set_visible(False)
 		plt.tight_layout()
 		if normalized:
-			ymin = max(10**-3,df_shells[cols].min().min())
+			ymin = max(10**-2,df_shells[cols].min().min())  ########################################
 			ax.set_ylim(ymin=ymin)  # don't show noise caused by NaN intensities (reassigned to 0.1) 
 		if save_img:
 			fig.savefig(join(self.dir_name,"fig_XDS_Shellintensities.png"),dpi=200)
@@ -492,14 +491,18 @@ class XDSAscii:
 		return df_shells
 
 
-	def PlotDhalfvsResolution(self,asci_byframe,N_shells=10,K=0.2,weights=(0.75,0.25),save_img=True):
+	def PlotDhalfvsResolution(self,asci_byframe,N_shells=10,npeak_ratio=1,\
+		K2=0.2,K1=1.0,weights=(0.75,0.25),save_img=True):
 		"""
 		Plots Dhalf vs. resolution
-		K: Constant in Dhalf = K * res**2 e.g. 2.0
+		K2: Constant in Dhalf = K * res**2 e.g. 2.0
+		K1: Constant in Dhalf = K * res**1
 		weights: tuple, weights of d_min, d_max respectively in d_space = d_min*w_min + d_max*w_max
-		w_min should be greater than w_max as there are more peaks at higher resolutions 
+		w_min should be greater than w_max as there are more peaks at higher resolutions
+		npeak_ratio: int, ratio of the N of peaks in highest to lowest res. shell 
+		npeak_ratio = 1 for equal number of peaks per shell
 		"""
-		df_shells = self.ShellIntensities(asci_byframe,N_shells,normalized=True)
+		df_shells = self.ShellIntensities(asci_byframe,N_shells,npeak_ratio,normalized=True)
 		
 		plt.close('all')
 		fig, ax = plt.subplots()
@@ -508,16 +511,16 @@ class XDSAscii:
 		# for a given shell define d_space = d_min*w_min + d_max*w_max
 		d_space = df_shells.d_min*weights[0] + df_shells.d_max*weights[1]
 		D_half = df_shells.D_half
-		plt.scatter(d_space,D_half,edgecolors='black',s=150)
+		plt.scatter(d_space,D_half,edgecolors='black',s=150, label=None)
 		# fitting line
 		x_min = d_space.iloc[-1] * 0.90
 		x_max = d_space.iloc[0] * 1.1
 		x = np.linspace(x_min, x_max, 100)
-		y = K * x**2
-		ax.plot(x, y, linestyle = '--', color='tab:red', linewidth=2)
-
-		ax.annotate(' $D_{1/2} \propto d^{2}$', xy=(0.74, 0.61), xycoords='axes fraction',\
-			fontsize='xx-large', horizontalalignment='center', verticalalignment='center', color='tab:red')
+		y2 = K2 * x**2
+		y1 = K1 * x**1
+		ax.plot(x, y2, linestyle = '--', color='tab:red', linewidth=2, label='$D_{1/2} \propto d^{2}$')
+		ax.plot(x, y1, linestyle = '--', color='tab:brown', linewidth=2, label='$D_{1/2} \propto d^{1}$')
+		ax.legend(fontsize='xx-large')
 
 		ax.set_xscale('log')
 		ax.set_yscale('log')
@@ -536,22 +539,6 @@ class XDSAscii:
 
 """
 if __name__ == "__main__":
-	name_template = '/home/thorne20/Desktop/MLFSOM/data_stills_6K8S_2.0A_10fr_1deg_350mm_ang252/stills_6K8S_2.0A_10fr_1deg_350mm_ang252_???_001.img'
-	xob = XDSAscii(name_template,19)
-	xob.ReadAllAscii()
-	
-	df = xob.peaks.copy()
-	int_cols = [x for x in df.columns if x.startswith('I_')]
-	df[df[int_cols]<0] = 0
-	
-	df = df[(df.I_1.notna()) & (df.I_10.notna())]
+	name_template = ...
 
-	df = df[df.peak>85]
-
-	print xob.PlotShellIntensities(df,N_shells=10)
-	#xob.PlotShellIntensities(xob.peaks,N_shells=20)
-	#pickle.dump(asci,open('asci.pickle','w'))
-	#asci = pickle.load(open('asci.pickle'))
-	#shells = obj.PlotShellIntensities(obj.peaks)
-	#obj.PlotMosCellBfac(save_img=True)
 """
