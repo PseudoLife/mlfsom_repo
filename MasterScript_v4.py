@@ -113,8 +113,8 @@ def GetHomogenousExperimentList(stills, start_mos, k_mos, k_cell, k_bfactor, fra
         else:
             phi = phi_start + frame*osc
         experiment_list.append(\
-            (ID, round(start_mos+k_mos*dose,3), round(k_bfactor*dose,2),\
-             round(k_cell*dose,4), osc, round(phi,2), round(distance,3), "%.2e" %flux, xtal_size, beam_size))
+            (ID, round(start_mos+k_mos*dose,5), round(k_bfactor*dose,3),\
+             round(k_cell*dose,6), osc, round(phi,2), round(distance,4), "%.2e" %flux, xtal_size, beam_size))
     # experiment_list: (ID,mos,bfactor_inc,cell_inc,osc,phi,distance,sub_flux,sub_xtal_size,sub_beam_size)
     return experiment_list
 
