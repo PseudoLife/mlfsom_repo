@@ -149,13 +149,18 @@ class XDSAscii:
 			fnumber = int(asci_file.split('_')[2][0:3])
 			asci = ReadSingleXDSAscii(asci_file)
 
-			asci.drop(columns=['h','k','l','sigIasci','psi'],inplace=True)
+			# Drop duplicate hkl values - drop them all
+			# when total oscillation angle large e.g. 80 deg, I observed duplicate hkl values
+			# ~0.2% of peaks were duplicates but they mess up things, so I just discarded them 
+			asci = asci[~asci.index.duplicated(keep=False)]
+			
+			asci.drop(columns=['h','k','l','sigIasci','psi','rlp'],inplace=True)
 			asci.rename(columns={'Iasci':'I_'+str(fnumber), 'xd':'xd_'+str(fnumber), 'yd':'yd_'+str(fnumber),\
-				'zd':'zd_'+str(fnumber), 'rlp':'rlp_'+str(fnumber), 'peak':'peak_'+str(fnumber), \
+				'zd':'zd_'+str(fnumber), 'peak':'peak_'+str(fnumber), \
 				'cor':'cor_'+str(fnumber), 'res':'res_'+str(fnumber)}, inplace=True)
 			asci_byframe = asci_byframe.join(asci, how='outer')
 
-		# calculate avg peak loc, rlp, partiality etc. over all frames
+		# calculate avg peak loc, partiality etc. over all frames
 		xd_cols = [x for x in asci_byframe.columns if x.startswith('xd_')]
 		asci_byframe['xd'] = asci_byframe[xd_cols].apply(np.mean,axis=1)
 
@@ -164,9 +169,6 @@ class XDSAscii:
 
 		zd_cols = [x for x in asci_byframe.columns if x.startswith('zd_')]
 		asci_byframe['zd'] = asci_byframe[zd_cols].apply(np.mean,axis=1)
-
-		rlp_cols = [x for x in asci_byframe.columns if x.startswith('rlp_')]
-		asci_byframe['rlp'] = asci_byframe[rlp_cols].apply(np.mean,axis=1)
 
 		peak_cols = [x for x in asci_byframe.columns if x.startswith('peak_')]
 		asci_byframe['peak'] = asci_byframe[peak_cols].apply(np.mean,axis=1)
@@ -177,10 +179,10 @@ class XDSAscii:
 		res_cols = [x for x in asci_byframe.columns if x.startswith('res_')]
 		asci_byframe['res'] = asci_byframe[res_cols].apply(np.mean,axis=1)
 
-		# Drop peak loc, rlp etc. by frame, keep only avg values calculated above
+		# Drop peak loc etc. by frame, keep only avg values calculated above
 		drop_cols = [x for x in asci_byframe.columns if x.startswith('xd_') or \
-		x.startswith('yd_') or x.startswith('zd_') or x.startswith('rlp_') or \
-		x.startswith('peak_') or x.startswith('cor_') or x.startswith('res_')]
+		x.startswith('yd_') or x.startswith('zd_') or x.startswith('peak_') or \
+		x.startswith('cor_') or x.startswith('res_')]
 		asci_byframe.drop(columns=drop_cols,inplace=True)
 
 		# Sort cols so that I_1, I_2, ..., xd, yd, zd, ... 
@@ -244,7 +246,7 @@ class XDSAscii:
 		start_mos = float(self.description.loc['start_mos','value'])
 		k_mos = float(self.description.loc['k_mos','value'])
 		input_mos = np.linspace(start_mos,start_mos+k_mos*(frames-1),frames)
-		axs[0,0].plot(np.arange(1,frames+1),input_mos,label='MLFSOM input',color='black',linewidth=2)
+		#axs[0,0].plot(np.arange(1,frames+1),input_mos,label='MLFSOM input',color='black',linewidth=2)
 
 		# B-factor
 		axs[0,1].scatter(mcb.index,mcb.wilsonB,label='XDS refined',facecolor='tab:orange',s=30)
@@ -258,7 +260,7 @@ class XDSAscii:
 		if 'start_bfactor' in locals() and start_bfactor != 'NULL':
 			start_bfactor = float(start_bfactor)
 			input_bfactor = np.linspace(start_bfactor,start_bfactor+k_bfactor*(frames-1),frames)
-			axs[0,1].plot(np.arange(1,frames+1),input_bfactor,label='MLFSOM input',color='black',linewidth=2)
+			#axs[0,1].plot(np.arange(1,frames+1),input_bfactor,label='MLFSOM input',color='black',linewidth=2)
 		
 		start_cellA, start_cellB, start_cellC = self.unit_cell[0:3]
 		k_cell = float(self.description.loc['k_cell','value'])
@@ -266,19 +268,19 @@ class XDSAscii:
 		axs[1,0].scatter(mcb.index,mcb.cellA,label='XDS refined',facecolor='tab:green',s=30)
 		axs[1,0].set_ylabel('Cell-A')
 		input_cellA = np.linspace(start_cellA, start_cellA+start_cellA*k_cell*(frames-1),frames)
-		axs[1,0].plot(np.arange(1,frames+1),input_cellA,label='MLFSOM input',color='black',linewidth=2)
+		#axs[1,0].plot(np.arange(1,frames+1),input_cellA,label='MLFSOM input',color='black',linewidth=2)
 
 		# Cell-B
 		axs[1,1].scatter(mcb.index,mcb.cellB,label='XDS refined',facecolor='tab:red',s=30)
 		axs[1,1].set_ylabel('Cell-B')
 		input_cellB = np.linspace(start_cellB, start_cellB+start_cellB*k_cell*(frames-1),frames)
-		axs[1,1].plot(np.arange(1,frames+1),input_cellB,label='MLFSOM input',color='black',linewidth=2)
+		#axs[1,1].plot(np.arange(1,frames+1),input_cellB,label='MLFSOM input',color='black',linewidth=2)
 
 		# Cell-C
 		axs[1,2].scatter(mcb.index,mcb.cellC,label='XDS refined',facecolor='tab:purple',s=30)
 		axs[1,2].set_ylabel('Cell-C')
 		input_cellC = np.linspace(start_cellC, start_cellC+start_cellC*k_cell*(frames-1),frames)
-		axs[1,2].plot(np.arange(1,frames+1),input_cellC,label='MLFSOM input',color='black',linewidth=2)
+		#axs[1,2].plot(np.arange(1,frames+1),input_cellC,label='MLFSOM input',color='black',linewidth=2)
 
 		# General figure settings applied to every subplot
 		for row in range(2):
