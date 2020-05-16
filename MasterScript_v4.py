@@ -1,9 +1,8 @@
-import os, time, math, tempfile, shutil
+import os, subprocess, time, math, tempfile, shutil
 from os.path import join
-import subprocess
+from glob import glob
 #import multiprocessing as mp
 import pathos.multiprocessing as mp
-from glob import glob
 import pandas as pd
 
 mlfsom_path=os.path.expanduser('~/Desktop/MLFSOM')
