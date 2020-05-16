@@ -10,7 +10,7 @@ mlfsom_path=os.path.expanduser('~/Desktop/MLFSOM')
 tmp_path = join(tempfile.gettempdir(), os.environ.get('USER'))
 
 
-def GetExperimentList(N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, \
+def GetGaussianExperimentList(N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, \
     osc=0.01, exposure=0.5, xtal_size=200, beam_fwhm_x=100, beam_fwhm_y=100):
     """
     Used by the fn: SpacialDependentCrystal
@@ -266,7 +266,7 @@ def SpacialDependentCrystal(prefix,N_grid,start_mos,k_mos,k_cell,k_bfactor,\
     output_folder = join(mlfsom_path,'data_'+prefix)
     os.system('mkdir --parents ' + output_folder)  # create sub-fol to save output files
 
-    frame_weights,experiment_list = GetExperimentList(N_grid, start_mos, k_mos, k_cell, \
+    frame_weights,experiment_list = GetGaussianExperimentList(N_grid, start_mos, k_mos, k_cell, \
         k_bfactor, frames, osc, exposure, xtal_size, beam_fwhm_x, beam_fwhm_y)
     WriteDescription(prefix, N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, resolution, \
     solvent_B, osc, exposure, xtal_size, beam_fwhm_x, beam_fwhm_y, threads, frame_weights)
@@ -341,8 +341,9 @@ def WriteExpQueueAndList(prefix,experiment_list):
 
 
 def WriteDescription(\
-    pdb_file, prefix, stills, N_grid, start_mos, k_mos, k_cell, k_bfactor, frames, resolution, \
-    solvent_B, phi_start, osc, distance, flux, xtal_size, beam_fwhm_x, beam_fwhm_y, threads, frame_weights):
+    pdb_file, prefix, stills, N_grid, start_mos, k_mos, k_cell, k_bfactor, \
+    frames, resolution, solvent_B, phi_start, osc, distance, flux, \
+    xtal_size, beam_fwhm_x, beam_fwhm_y, threads, frame_weights):
     """
     Used by fn: HomogenousCrystal, SpacialDependentCrystal
     Writes exp. params to a file e.g. exp-prefix-desc.txt
@@ -374,59 +375,3 @@ def WriteDescription(\
     for i in frame_weights:
         f.write(str(i)+"\n")
     f.close()
-
-
-def CleanMessAfterStuck(prefix):
-    """
-    Standalone fn
-    When HomogenousCrystal or SpacialDependentCrystal fn gets stuck, use this fn to
-    1) move temp *.XYI and *predin.txt files and input*.pdb and mtz files to appropriate fol
-    2) remove unnecessary files e.g. fit2d_001.in etc. and other tmp files  
-    """
-    prev_cwd = os.getcwd()
-    os.chdir(mlfsom_path)
-    output_folder = join(mlfsom_path,'data_'+prefix)
-
-    os.system('mv ' + join(tmp_path,'mlfsom*.XYI ') + output_folder)
-    os.system('mv '+ join(tmp_path,'mlfsom*predin.txt ') + output_folder)
-    os.system('mv ' + join(mlfsom_path,'input*.pdb ') + output_folder)
-    os.system('mv ' + join(mlfsom_path,'input*.mtz ') + output_folder)
-    os.system('mv ' + join(mlfsom_path,'exp-'+prefix+'*.txt ') + output_folder)     
-    os.system('rm '+ join(mlfsom_path,'fit2d_*'))
-    os.system('rm ' + join(tmp_path,'*'))
-    os.chdir(prev_cwd)
-
-
-def RunFromQueue(exp_desc_file,exp_queue_file,threads=None):
-    """
-    Standalone fn
-    When certain frames are not generated after using HomogenousCrystal or SpacialDependentCrystal...
-    use this fn to rerun those exp.
-    
-    Takes desc file and queue file listing exps
-    Then runs the specified exps just like HomogenousCrystal or SpacialDependentCrystal
-    queue file can be created by modifying original exp-XXX-queue.txt file
-    exp_queue_file: lists frames to be rerun
-    threads: number of frames run at once - uses #threads in the desc file if not specified
-    """
-    # Read desc file in a dataframe, get the necessary params 
-    df_desc = pd.read_csv(exp_desc_file,sep=': ',engine='python',header=None,index_col=0,names=['param','value'])
-    pdb_file = df_desc.loc['pdb_file','value']
-    prefix = df_desc.loc['prefix','value']
-    resolution = df_desc.loc['resolution','value']
-    solvent_B = df_desc.loc['solvent_B','value']
-    if threads == None:
-        threads = int(df_desc.loc['threads','value'])
-
-    # Read queue file, create experiment_list
-    with open(exp_queue_file) as myfile:
-        lines = myfile.readlines()
-    experiment_list = [eval(line.strip()) for line in lines]
-
-    output_folder = join(mlfsom_path,'data_'+prefix)
-    os.system('mkdir --parents ' + output_folder)  # create sub-fol to save output files
-    RunExperiments(pdb_file,prefix,experiment_list,resolution,solvent_B,threads)
-    # Move files
-    os.system('mv ' + join(mlfsom_path,'input*.pdb ') + output_folder)
-    os.system('mv ' + join(mlfsom_path,'input*.mtz ') + output_folder)
-    os.system('mv ' + join(mlfsom_path,'exp-'+prefix+'*.txt ') + output_folder)
