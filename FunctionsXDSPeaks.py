@@ -72,7 +72,7 @@ class XDSAscii:
 		"""
 		cwd = os.getcwd()
 		os.chdir(self.dir_name)
-		img_list = [x for x in os.listdir('.') if x.endswith('.img')]
+		img_list = glob(self.base_name.replace('???','*'))
 		fr_idx = self.base_name.split('_').index('???')
 		if add_one:
 			shift_by = 1
