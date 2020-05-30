@@ -29,6 +29,12 @@ for img in img_list:
     os.rename(img,new_name)
 
 
+fol_list = [x for x in os.listdir('.') if x.startswith('Run_')]
+for fol in fol_list:
+	subprocess.call(['cp',join(fol,'CORRECT.LP'),'CORRECT_'+fol.split('_')[1]+'.LP'])
+	subprocess.call(['cp',join(fol,'XDS_ASCII.HKL'),'XDS_ASCII_'+fol.split('_')[1]+'.HKL'])
+
+
 #df = pd.read_csv('mlfsom_tempfile0_preds_1.XYI',sep=' ',header=None)
 #df.rename(columns={6:'h',7:'k',8:'l',0:'hor',1:'ver'},inplace=True)
 #sub = df[df.ver.between(1567,1587) & df.hor.between(955,975)]
