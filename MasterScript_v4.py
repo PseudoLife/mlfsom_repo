@@ -191,7 +191,7 @@ def RunExperiments(pdb_file,prefix,experiment_list,resolution,solvent_B,threads)
             os.system('mv '+ join(tmp_path,exp_fol,'mlfsom*predin.txt ') + output_folder)
         os.system('rm -rf ' + join(tmp_path,'*'))
     
-    # Move files from inside sub dirs to the output dir, clear sub dirs       
+    # Move files from inside sub dirs to the output dir and clear sub dirs at the end      
     data_sub_fols = [x for x in os.listdir(output_folder) if x.startswith('exp_')]
     for exp_fol in data_sub_fols:
         os.system('mv ' + join(output_folder,exp_fol,'*.img ') + output_folder)
