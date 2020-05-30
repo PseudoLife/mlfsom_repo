@@ -463,15 +463,15 @@ class XDSAscii:
 			d_min,d_max,half_dose = df_shells.loc[shell_index,['d_min','d_max','D_half']]
 			intensities = df_shells.loc[shell_index,cols]
 
-			#ax.plot(frame_numbers,intensities,marker='o',lw=2,label='%s - %s | %s' \
-			#	%(toPrecision(d_max,3),toPrecision(d_min,3),toPrecision(half_dose,3)))
-
-			ax.scatter(frame_numbers,intensities,label='%s - %s | %s' \
+			ax.plot(frame_numbers,intensities,marker='o',lw=2,label='%s - %s | %s' \
 				%(toPrecision(d_max,3),toPrecision(d_min,3),toPrecision(half_dose,3)))
 
+			#ax.scatter(frame_numbers,intensities,label='%s - %s | %s' \
+			#	%(toPrecision(d_max,3),toPrecision(d_min,3),toPrecision(half_dose,3)))
+
 		ax.set_yscale('log')
-		#leg = ax.legend(fontsize='x-small',markerscale=0)
-		leg = ax.legend(fontsize='x-small')
+		leg = ax.legend(fontsize='x-small',markerscale=0)
+		#leg = ax.legend(fontsize='x-small')
 		leg.set_title('Resolution ($\mathrm{\AA)}$ | $D_{1/2}$',prop={'size':'x-small'})
 		ax.set_xlabel('Frame Number',fontsize='x-large')
 		ax.set_ylabel('XDS Integrated Intensity \n(indexed-corrected)',fontsize='x-large')
