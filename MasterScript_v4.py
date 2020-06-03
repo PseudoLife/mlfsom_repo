@@ -52,7 +52,7 @@ def GetGaussianExperimentList(N_grid, start_mos, k_mos, k_cell, k_bfactor, frame
                 cell_list.append((i+.5,j+.5,weight))
     
     sub_xtal_size = xtal_size/float(N_grid)  # sub-crystal size - input for mlfsom
-    sub_beam_size = 2.0 * sub_xtal_size  # beam size - input for mlfsom, must be greater than sub_xtal_size
+    sub_beam_size = 2.0 * sub_xtal_size  # beam size - input for mlfsom, must be greater than sub_xtal_size    
     beam_sigma_x = beam_fwhm_x/2.355
     beam_sigma_y = beam_fwhm_y/2.355
 
@@ -63,7 +63,7 @@ def GetGaussianExperimentList(N_grid, start_mos, k_mos, k_cell, k_bfactor, frame
     # tuple (frame,weight,experiment_ID)
     for frame in range(0,frames):
         for cell in cell_list:
-            ID = len(experiment_list)   ##################### +1 ?????????????????????????????????????
+            ID = len(experiment_list)
             frame_weights.append((frame,cell[2],ID))  
             x_coord = cell[0]*sub_xtal_size
             y_coord = cell[1]*sub_xtal_size
@@ -74,11 +74,15 @@ def GetGaussianExperimentList(N_grid, start_mos, k_mos, k_cell, k_bfactor, frame
             dose = frame*decay_factor
             sub_flux = flux*decay_factor
             phi = phi_start 
+            #experiment_list.append(\
+            #    (ID, round(start_mos+k_mos*dose,5), round(k_bfactor*dose,3), \
+            #     round(k_cell*dose,6), osc, round(phi,2), round(distance,4), \
+            #     "%.2e" %sub_flux, sub_xtal_size, sub_beam_size))
             experiment_list.append(\
                 (ID, round(start_mos+k_mos*dose,5), round(k_bfactor*dose,3), \
                  round(k_cell*dose,6), osc, round(phi,2), round(distance,4), \
-                 "%.2e" %sub_flux, sub_xtal_size, sub_beam_size))
-    
+                 "%.2e" %sub_flux, 77.8, 100)) 
+
     # experiment_list:
     # (ID,mos,bfactor_inc,cell_inc,osc,phi,distance,sub_flux,sub_xtal_size,sub_beam_size)
     # frame_wights: (frame,weight,experiment_ID)
