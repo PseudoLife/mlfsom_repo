@@ -4,15 +4,11 @@ from os.path import join
 import pandas as pd
 import numpy as np
 
-#name_template = '/home/thorne20/Desktop/MLFSOM/data_trial_gau/trial_???_001.img'
-#name_template = '/home/thorne20/Desktop/MLFSOM/data_trial_gaussian/trial_gaussian_???_001.img'
-#name_template = '/home/thorne20/Desktop/MLFSOM/data_trial_gaussian_1H87_2.5A_Ngrid10_fr50/trial_gaussian_2.5A_fr50_???_001.img'
-#name_template = '/home/thorne20/Desktop/MLFSOM/data_trial_gaussian_6K8S/trial_gaussian_6K8S_???_001.img'
-#name_template = '/home/thorne20/Desktop/MLFSOM/data_gaussian_1H87_2.0A_3deg_grid10_fr20/gaussian_1H87_2.0A_3deg_grid10_fr20_???_001.img'
-#name_template = '/home/thorne20/Desktop/MLFSOM/data_gaussian_1H87_2.0A_3deg_grid10_fr20_highflux/gaussian_1H87_2.0A_3deg_grid10_fr20_highflux_???_001.img'
-#name_template = '/home/thorne20/Desktop/MLFSOM/data_gaussian_1H87_2.0A_3deg_grid10_fr20_wild/gaussian_1H87_2.0A_3deg_grid10_fr20_wild_???_001.img'
-#name_template = '/home/thorne20/Desktop/MLFSOM/data_gaussian_1H87_2.0A_3deg_grid6_fr20/gaussian_1H87_2.0A_3deg_grid6_fr20_???_001.img'
-name_template = '/home/thorne20/Desktop/MLFSOM/data_gaussian_1H87_2.5A_3deg_grid20_fr20_xtal400/gaussian_1H87_2.5A_3deg_grid20_fr20_xtal400_???_001.img'
+#name_template = '/home/thorne20/Desktop/MLFSOM/data_gaussian_1H87_2.0A_3deg_grid10_fr20_xtal200_fixedsubxtal/gaussian_1H87_2.0A_3deg_grid10_fr20_xtal200_fixedsubxtal_???_001.img'
+#name_template = '/home/thorne20/Desktop/MLFSOM/data_gaussian_1H87_2.0A_3deg_grid10_fr20_xtal500_fixedsubxtal/gaussian_1H87_2.0A_3deg_grid10_fr20_xtal500_fixedsubxtal_???_001.img'
+#name_template = '/home/thorne20/Desktop/MLFSOM/data_gaussian_1H87_2.0A_3deg_grid6_fr20_xtal50_fixedsubxtal/gaussian_1H87_2.0A_3deg_grid6_fr20_xtal50_fixedsubxtal_???_001.img'
+#name_template = '/home/thorne20/Desktop/MLFSOM/data_gaussian_1H87_2.5A_3deg_grid20_fr20_xtal500_fixedsubxtal/gaussian_1H87_2.5A_3deg_grid20_fr20_xtal500_fixedsubxtal_???_001.img'
+name_template = '/home/thorne20/Desktop/MLFSOM/data_gaussian_1H87_2.0A_3deg_grid10_fr20_xtal200_fixedsubxtal/gaussian_1H87_2.0A_3deg_grid10_fr20_xtal200_fixedsubxtal_???_001.img'
 
 dir_name = os.path.dirname(name_template)
 base_name = os.path.basename(name_template)
@@ -36,6 +32,6 @@ for fnumber in range(int(description.loc['frames','value'])):
 		im = fabio.open( name_template.replace('???',str(ID)) )
 		overlaid_data += im.data.astype('float') * df_weights.weight[ID]
 		sum_weights += df_weights.weight[ID]
-	im0.data = (overlaid_data/sum_weights).astype('uint16')
-	#im0.data = overlaid_data
+	#im0.data = (overlaid_data/sum_weights).astype('uint16') 
+	im0.data = (overlaid_data/sum_weights *5.).astype('uint16')
 	im0.save( name_template.replace('???','aggregate_'+str(fnumber+1).zfill(3)) )
