@@ -308,7 +308,7 @@ class DIALSAscii:
 		for axis in ['top','bottom','left','right']: ax.spines[axis].set_visible(False)
 		plt.tight_layout()
 		if normalized:
-			ymin = max(10**-2,df_shells[cols].min().min())  ########################################
+			ymin = max(10**-2,df_shells[cols].min().min())
 			ax.set_ylim(ymin=ymin)  # don't show noise caused by NaN intensities (reassigned to 0.1) 
 		if save_img:
 			fig.savefig(join(self.dir_name,"fig_DIALS_Shellintensities.png"),dpi=200)
