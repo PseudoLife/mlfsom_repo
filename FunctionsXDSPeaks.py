@@ -65,7 +65,7 @@ class XDSAscii:
 							break
 
 
-	def RenameImages(self,add_one):
+	def RenameImages(self):
 		"""
 		Reindexes mlfsom frame numbers so that they start from 1 with leading zeros e.g. 001, 056
 		add_one: if True, adds 1 to each frame ID
@@ -74,19 +74,15 @@ class XDSAscii:
 		os.chdir(self.dir_name)
 		img_list = glob(self.base_name.replace('???','*'))
 		fr_idx = self.base_name.split('_').index('???')
-		if add_one:
-			shift_by = 1
-		else:
-			shift_by = 0
 		for img in img_list:
 			new_name = '_'.join( img.split('_')[0:fr_idx] + \
-				[('00'+str(int(img.split('_')[fr_idx])+shift_by))[-3::]] + img.split('_')[fr_idx+1::] )
+				[('00'+str(int(img.split('_')[fr_idx])))[-3::]] + img.split('_')[fr_idx+1::] )
 			os.rename(img,new_name)
 		self.renamed = True
 		os.chdir(cwd)
 
 
-	def ProcessStills(self):
+	def ProcessStills(self,minpk=75):
 		"""
 		Processes fake img files using XDS (indexing, integrating, correcting)
 		Renames and saves CORRECT.LP and XDS_ASCII.HKL files from eachs still frame
@@ -128,6 +124,8 @@ class XDSAscii:
 					%(' '.join([str(x) for x in self.unit_cell]))
 				if 'SPACE_GROUP_NUMBER=' in line:
 					line = 'SPACE_GROUP_NUMBER= %i' %(self.space_group)
+				if 'MINPK=' in line:
+					line = 'MINPK= %.1f !min required percent of observed refl int, def:75' %minpk
 				print line
 
 			subprocess.call(['xds'])
@@ -137,7 +135,7 @@ class XDSAscii:
 		os.chdir(cwd)
 
 
-	def ReadAllAscii(self):
+	def ReadAllPeaks(self):
 		"""
 		Reads multi XDS_ASCII.HKL files and merges them into a single dataframe
 		"""
@@ -246,7 +244,7 @@ class XDSAscii:
 		start_mos = float(self.description.loc['start_mos','value'])
 		k_mos = float(self.description.loc['k_mos','value'])
 		input_mos = np.linspace(start_mos,start_mos+k_mos*(frames-1),frames)
-		#axs[0,0].plot(np.arange(1,frames+1),input_mos,label='MLFSOM input',color='black',linewidth=2)
+		axs[0,0].plot(np.arange(1,frames+1),input_mos,label='MLFSOM input',color='black',linewidth=2)
 
 		# B-factor
 		axs[0,1].scatter(mcb.index,mcb.wilsonB,label='XDS refined',facecolor='tab:orange',s=30)
@@ -260,7 +258,7 @@ class XDSAscii:
 		if 'start_bfactor' in locals() and start_bfactor != 'NULL':
 			start_bfactor = float(start_bfactor)
 			input_bfactor = np.linspace(start_bfactor,start_bfactor+k_bfactor*(frames-1),frames)
-			#axs[0,1].plot(np.arange(1,frames+1),input_bfactor,label='MLFSOM input',color='black',linewidth=2)
+			axs[0,1].plot(np.arange(1,frames+1),input_bfactor,label='MLFSOM input',color='black',linewidth=2)
 		
 		start_cellA, start_cellB, start_cellC = self.unit_cell[0:3]
 		k_cell = float(self.description.loc['k_cell','value'])
@@ -268,19 +266,19 @@ class XDSAscii:
 		axs[1,0].scatter(mcb.index,mcb.cellA,label='XDS refined',facecolor='tab:green',s=30)
 		axs[1,0].set_ylabel('Cell-A')
 		input_cellA = np.linspace(start_cellA, start_cellA+start_cellA*k_cell*(frames-1),frames)
-		#axs[1,0].plot(np.arange(1,frames+1),input_cellA,label='MLFSOM input',color='black',linewidth=2)
+		axs[1,0].plot(np.arange(1,frames+1),input_cellA,label='MLFSOM input',color='black',linewidth=2)
 
 		# Cell-B
 		axs[1,1].scatter(mcb.index,mcb.cellB,label='XDS refined',facecolor='tab:red',s=30)
 		axs[1,1].set_ylabel('Cell-B')
 		input_cellB = np.linspace(start_cellB, start_cellB+start_cellB*k_cell*(frames-1),frames)
-		#axs[1,1].plot(np.arange(1,frames+1),input_cellB,label='MLFSOM input',color='black',linewidth=2)
+		axs[1,1].plot(np.arange(1,frames+1),input_cellB,label='MLFSOM input',color='black',linewidth=2)
 
 		# Cell-C
 		axs[1,2].scatter(mcb.index,mcb.cellC,label='XDS refined',facecolor='tab:purple',s=30)
 		axs[1,2].set_ylabel('Cell-C')
 		input_cellC = np.linspace(start_cellC, start_cellC+start_cellC*k_cell*(frames-1),frames)
-		#axs[1,2].plot(np.arange(1,frames+1),input_cellC,label='MLFSOM input',color='black',linewidth=2)
+		axs[1,2].plot(np.arange(1,frames+1),input_cellC,label='MLFSOM input',color='black',linewidth=2)
 
 		# General figure settings applied to every subplot
 		for row in range(2):
@@ -484,8 +482,8 @@ class XDSAscii:
 		for axis in ['top','bottom','left','right']: ax.spines[axis].set_visible(False)
 		plt.tight_layout()
 		if normalized:
-			ymin = max(10**-2,df_shells[cols].min().min())  ########################################
-			ax.set_ylim(ymin=ymin)  # don't show noise caused by NaN intensities (reassigned to 0.1) 
+			ymin = max(10**-2,df_shells[cols].min().min())
+			ax.set_ylim(ymin=ymin)  # don't show noise caused by NaN intensities (reassigned to 0.1)
 		if save_img:
 			fig.savefig(join(self.dir_name,"fig_XDS_Shellintensities.png"),dpi=200)
 		plt.show()
